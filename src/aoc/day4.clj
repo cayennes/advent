@@ -4,10 +4,10 @@
   [digits]
   (reduce #(+ (* 10 %1) %2) digits))
 
-(defn double-at
+(defn double-item-at
   [digits double-idx]
   (let [[start end] (split-at double-idx digits)]
-    (concat start [(first end)] end)))
+    (vec (concat start [(first end)] end))))
 
 (defn possibilities-within
   [start end]
@@ -18,7 +18,7 @@
          d (range c 10)
          e (range d 10)
          double-idx (range 5)
-         :let [code (-> [a b c d e] (double-at double-idx) (digits->number))]
+         :let [code (-> [a b c d e] (double-item-at double-idx) (digits->number))]
          :when (<= start code)
          :while (<= code end)]
      code)))
@@ -35,14 +35,12 @@
          d (range c 10)
          e (range d 10)
          double-idx (range 5)
-         :let [pre-code [a b c d e]
-               code (double-at pre-code double-idx)
+         :let [code (double-item-at [a b c d e] double-idx)
                code-number (digits->number code)]
          :when (and (<= start code-number)
-                    (not= (get pre-code double-idx)
-                          (get pre-code (inc double-idx)))
-                    (not= (get pre-code double-idx)
-                          (get pre-code (dec double-idx))))
+                    (distinct? (get code double-idx)
+                               (get code (dec double-idx))
+                               (get code (+ 2 double-idx))))
          :while (<= code-number end)]
      code-number)))
 
