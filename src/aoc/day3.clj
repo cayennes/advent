@@ -74,47 +74,11 @@ U98,R91,D20,R16,D67,R40,U7,R15,U6,R7")
   (string->closest-intersection
    "R8,U5,L5,D3\nU7,R6,D4,L4"))
 
-(defn indexed-loc-seqs
-  [input]
-  (map #(map-indexed vector (wire-loc-seq %))
-       input))
-
-(defn string->indexed-loc-seqs
-  [s]
-  (->> s parse indexed-loc-seqs))
-
 (defn all-pairs
   [s]
   (for [[i s-i] (map-indexed vector s)
         s-j (take i s)]
     #{s-i s-j}))
-
-(defn pairwise-intersections
-  "given a set of sets, returns items that are in more than one"
-  [s]
-  (->> s
-       (map set)
-       (all-pairs)
-       (map #(apply set/intersection %))
-       (apply concat)
-       (filter identity)
-       (set)))
-
-(comment
-  (pairwise-intersections [(range 2 3) (range 4) [0 0] (range 6) (range 5 9)]))
-
-(defn wrong-shortest-path-intersection
-  [loc-seqs]
-  (first (for [n (range 1 10000)
-               :let [wire-starts (map #(take n (rest %)) loc-seqs)]
-               :when (not-empty (pairwise-intersections wire-starts))]
-           n)))
-
-(defn string->wrong-shortest-path-intersection
-  [s]
-  (->> s parse (map wire-loc-seq) wrong-shortest-path-intersection))
-
-;; part 2 attempt 2
 
 (defn wire-dist-diagram
   [wire wire-num]
@@ -131,11 +95,6 @@ U98,R91,D20,R16,D67,R40,U7,R15,U6,R7")
   [wire-dist-set]
   (> (count (distinct (map :wire wire-dist-set)))
      1))
-
-(comment (multiple-wires? #{{:wire 1, :distance 4} {:wire 0, :distance 2}})
-         (multiple-wires? #{{:wire 1, :distance 4} {:wire 1, :distance 2}})
-         (multiple-wires? #{{:wire 1, :distance 4}})
-         (multiple-wires? #{}))
 
 (defn wires-dist
   [wire-dist-set]
