@@ -5,7 +5,7 @@
 
 (defn fuel-required
   [mass]
-  (- (Math/floor (/ mass 3))
+  (- (quot mass 3)
      2))
 
 (defn day1a
