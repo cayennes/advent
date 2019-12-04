@@ -10,7 +10,7 @@
 
 (defn day1a
   []
-  (->> (string/split (slurp (io/resource "input")) #"\n")
+  (->> (string/split (slurp (io/resource "day1")) #"\n")
        (map edn/read-string)
        (map fuel-required)
        (apply +)))
@@ -24,7 +24,7 @@
 
 (defn day1b
   []
-  (->> (string/split (slurp (io/resource "input")) #"\n")
+  (->> (string/split (slurp (io/resource "day1")) #"\n")
        (map edn/read-string)
        (map total-fuel-required)
        (apply +)))
