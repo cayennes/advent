@@ -10,9 +10,22 @@
 
 (defn parse-instruction
   [code]
-  {:instruction (mod code 100)
-   :TODO :the-rest-of-this}) ;; combine mod and quot
+  (mod code 100))
+   
+(defn immediate-mode?
+ [op n]
+ (pos? 
+  (mod (quot op (* 100 n))
+   10)))
 
+(defn read-parameter
+ [{:keys [program position]} n]
+ (let [op (get program position)
+       raw-arg (get program (+ n position))]
+  (if (immediate-mode? op n)
+   raw-arg
+   (get program raw-arg))))                                                     
+                                                                              
 (defn exec-once
   [{:keys [program position input output]
     :or {output []}
