@@ -1,4 +1,4 @@
-(ns aoc.day2
+(ns aoc.intcode-computer
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.string :as string]))
