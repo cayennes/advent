@@ -45,7 +45,7 @@
     99 (assoc computer :halt true)))
 
 (defn exec-all
-  {:test #(is (= 17 (exec-all [3 0 4 0 99] [17])))}
+  {:test #(is (= 17 (exec-all [3 0 4 0 99] [17])))} ;; TODO: oops, this isn't output. make exec-all work with output. I guess it should have a whole computer datastructure after all.
   ([program input]
    (try (->> (iterate exec-once {:program program :position 0 :input input})
              (take-while #(not (:halt %)))
