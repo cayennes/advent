@@ -2,7 +2,7 @@
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.string :as string]
-            [clojure.test :refer [is run-tests]]))
+            [clojure.test :refer [deftest is run-tests]]))
 
 (defn parse
   [input]
@@ -45,26 +45,75 @@
    :input (or input [])
    :output []})
 
-(defn exec-once
-  {:test #(is (= [4]
-                 (:output (exec-once {:program [4 0 99] :position 0}))))}
-  [{:keys [program position input output]
-    :or {output []}
-    :as computer}]
-  (case (next-instruction computer)
-    1 (binary-op computer +) 
-    2 (binary-op computer *)
-    3 (-> computer
-          (update :program
-                  #(assoc %
-                          (read-parameter % position 1 true)
-                          (first input)))
-          (update :input rest)
-          (update :position + 2))
-    4 (-> computer
-          (update :output conj (read-parameter program position 1 false))
-          (update :position + 2))
-    99 (assoc computer :halt true)))
+(defmulti exec-once next-instruction)
+
+(defmethod exec-once 1
+  [computer]
+  (binary-op computer +))
+
+(defmethod exec-once 2
+  [computer]
+  (binary-op computer *))
+
+(defmethod exec-once 3
+  [{:keys [position input] :as computer}]
+  (-> computer
+      (update :program
+              #(assoc %
+                      (read-parameter % position 1 true)
+                      (first input)))
+      (update :input rest)
+      (update :position + 2)))
+
+(deftest op-3-works
+  (is (= [4] (:output (exec-once {:program [4 0 99] :position 0})))))
+
+(defmethod exec-once 4
+  [{:keys [program position] :as computer}]
+  (-> computer
+      (update :output conj (read-parameter program position 1 false))
+      (update :position + 2)))
+
+(defmethod exec-once 5
+  [{:keys [program position] :as computer}]
+  (if (not= 0 (read-parameter program position 1 false))
+    (assoc computer :position (read-parameter program position 2 false))
+    (update computer :position + 3)))
+
+(defmethod exec-once 6
+  [{:keys [program position] :as computer}]
+  (if (= 0 (read-parameter program position 1 false))
+    (assoc computer :position (read-parameter program position 2 false))
+    (update computer :position + 3)))
+
+(defmethod exec-once 7
+  [computer]
+  (binary-op computer #(if (< %1 %2) 1 0)))
+
+(defmethod exec-once 8
+  [computer]
+  (binary-op computer #(if (= %1 %2) 1 0)))
+
+(deftest day5-2-examples
+  (is (= 1 
+         (-> (exec-all [3 9 8 9 10 9 4 9 99 -1 8]
+                       [8])
+             (:output)
+             (last))))
+  (is (= 0 
+         (-> (exec-all [3 3 1108 -1 8 3 4 3 99]
+                       [7])
+             (:output)
+             (last))))
+  (is (= 1 
+         (-> (exec-all [3 12 6 12 15 1 13 14 13 4 13 99 -1 0 1 9]
+                       [8])
+             (:output)
+             (last)))))
+
+(defmethod exec-once 99
+  [computer]
+  (assoc computer :halt true))
 
 (defn exec-all
   {:test #(is (= 17 (-> (exec-all [3 0 4 0 99] [17])
@@ -98,7 +147,7 @@
                 :when (= 19690720 result)]
             (+ verb (* 100 noun))))))
 
-(comment "slow tests"
+(comment "slow test"
   (= 5398 (day2b)))
 
 (defn day5-1
@@ -106,6 +155,14 @@
   []
   (-> (parse (slurp (io/resource "day5")))
       (exec-all [1])
+      (:output)
+      (last)))
+
+(defn day5-2
+  {:test #(is (= 652726 (day5-2)))}
+  []
+  (-> (parse (slurp (io/resource "day5")))
+      (exec-all [5])
       (:output)
       (last)))
 
