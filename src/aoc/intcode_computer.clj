@@ -38,7 +38,16 @@
                          (read-parameter % position 2 false))))
       (update :position #(+ 4 %))))
 
+(defn new-computer
+  [program input]
+  {:program program
+   :position 0
+   :input (or input [])
+   :output []})
+
 (defn exec-once
+  {:test #(is (= [4]
+                 (:output (exec-once {:program [4 0 99] :position 0}))))}
   [{:keys [program position input output]
     :or {output []}
     :as computer}]
@@ -48,26 +57,24 @@
     3 (-> computer
           (update :program
                   #(assoc %
-                          (get % (inc position))
+                          (read-parameter % position 1 true)
                           (first input)))
           (update :input rest)
           (update :position + 2))
     4 (-> computer
-          (update :output conj (get program (+ 1 position)))
+          (update :output conj (read-parameter program position 1 false))
           (update :position + 2))
     99 (assoc computer :halt true)))
 
 (defn exec-all
-  {:test #(is (= 17 (exec-all [3 0 4 0 99] [17])))} ;; TODO: oops, this isn't output. make exec-all work with output. I guess it should have a whole computer datastructure after all.
+  {:test #(is (= 17 (-> (exec-all [3 0 4 0 99] [17])
+                        :output
+                        last)))}
   ([program input]
-   (try (->> (iterate exec-once {:program program :position 0 :input input})
-             (take-while #(not (:halt %)))
-             last
-             :program
-             first)
-        #_(catch Exception e
-            nil)))
-  ([program] (exec-all program [])))
+   (->> (iterate exec-once (new-computer program input))
+        (take-while #(not (:halt %)))
+        last))
+  ([program] (exec-all program nil)))
 
 (defn day2a
   {:test #(is (= 4576384 (day2a)))}
@@ -75,19 +82,31 @@
   (-> (parse (slurp (io/resource "day2")))
       (assoc 1 12
              2 2)
-      (exec-all)))
+      (exec-all)
+      (:program)
+      (first)))
 
 (defn day2b
   []
-  (first (for [noun (range 100)
-               verb (range 100)
-               :let [output (exec-all (assoc (parse (slurp (io/resource "day2")))
-                                             1 noun
-                                             2 verb))]
-               :when (= 19690720 output)]
-           (+ verb (* 100 noun)))))
+  (let [input (parse (slurp (io/resource "day2")))]
+    (first (for [noun (range 100)
+                verb (range 100)
+                 :let [result (-> (assoc input 1 noun 2 verb)
+                                  (exec-all)
+                                  (:program)
+                                  (first))]
+                :when (= 19690720 result)]
+            (+ verb (* 100 noun))))))
 
 (comment "slow tests"
   (= 5398 (day2b)))
+
+(defn day5-1
+  {:test #(is (= 15314507 (day5-1)))}
+  []
+  (-> (parse (slurp (io/resource "day5")))
+      (exec-all [1])
+      (:output)
+      (last)))
 
 (run-tests)
