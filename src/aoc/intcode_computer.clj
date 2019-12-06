@@ -20,33 +20,31 @@
    10)))
 
 (defn read-parameter
-  [program position n write?]
+  [program position n raw?]
   (let [op (get program position)
         raw-arg (get program (+ n position))]
-    (if (or write?
+    (if (or raw?
             (immediate-mode? op n))
       raw-arg
       (get program raw-arg))))
+
+(defn binary-op
+  [{:keys [position] :as computer} f]
+  (-> computer
+      (update :program
+              #(assoc %
+                      (read-parameter % position 3 true)
+                      (f (read-parameter % position 1 false)
+                         (read-parameter % position 2 false))))
+      (update :position #(+ 4 %))))
 
 (defn exec-once
   [{:keys [program position input output]
     :or {output []}
     :as computer}]
   (case (next-instruction computer)
-    1 (-> computer
-          (update :program
-                  #(assoc %
-                          (read-parameter % position 3 true)
-                          (+ (read-parameter % position 1 false)
-                             (read-parameter % position 2 false))))
-          (update :position #(+ 4 %)))
-    2  (-> computer
-          (update :program
-                  #(assoc %
-                          (get % (+ 3 position))
-                          (* (get % (get % (+ 1 position)))
-                             (get % (get % (+ 2 position))))))
-          (update :position + 4))
+    1 (binary-op computer +) 
+    2 (binary-op computer *)
     3 (-> computer
           (update :program
                   #(assoc %
