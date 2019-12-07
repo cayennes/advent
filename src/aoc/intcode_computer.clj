@@ -94,23 +94,6 @@
   [computer]
   (binary-op computer #(if (= %1 %2) 1 0)))
 
-(deftest day5-2-examples
-  (is (= 1 
-         (-> (exec-all [3 9 8 9 10 9 4 9 99 -1 8]
-                       [8])
-             (:output)
-             (last))))
-  (is (= 0 
-         (-> (exec-all [3 3 1108 -1 8 3 4 3 99]
-                       [7])
-             (:output)
-             (last))))
-  (is (= 1 
-         (-> (exec-all [3 12 6 12 15 1 13 14 13 4 13 99 -1 0 1 9]
-                       [8])
-             (:output)
-             (last)))))
-
 (defmethod exec-once 99
   [computer]
   (assoc computer :halt true))
@@ -157,6 +140,23 @@
       (exec-all [1])
       (:output)
       (last)))
+
+(deftest day5-2-examples
+  (is (= 1 
+         (-> (exec-all [3 9 8 9 10 9 4 9 99 -1 8]
+                       [8])
+             (:output)
+             (last))))
+  (is (= 0 
+         (-> (exec-all [3 3 1108 -1 8 3 4 3 99]
+                       [7])
+             (:output)
+             (last))))
+  (is (= 1 
+         (-> (exec-all [3 12 6 12 15 1 13 14 13 4 13 99 -1 0 1 9]
+                       [8])
+             (:output)
+             (last)))))
 
 (defn day5-2
   {:test #(is (= 652726 (day5-2)))}

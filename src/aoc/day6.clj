@@ -2,7 +2,7 @@
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.string :as string]
-            [clojure.test :refer [deftest is run-tests]]))
+            [clojure.test :refer [is run-tests]]))
 
 (defn parse
   {:test #(is (= {:B :A :C :B}
