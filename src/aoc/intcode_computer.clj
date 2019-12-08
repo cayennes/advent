@@ -116,6 +116,11 @@
   [computer]
   (assoc computer :halt true))
 
+(defn needs-input?
+  [computer]
+  (and (:awaiting-input computer)
+       (empty? (:input computer))))
+
 (defn exec-all
   {:test #(is (= 17 (-> (new-computer [3 0 4 0 99] [17])
                         (exec-all)
@@ -124,7 +129,7 @@
   [computer]
   (->> (iterate exec-once computer)
        (drop-while #(not (or (:halt %)
-                             (:awaiting-input %))))
+                             (needs-input? %))))
        first))
 
 (defn day2a
@@ -259,14 +264,14 @@
                       (amplifier-vec [3 15 3 16 1002 16 10 16 1 16 15 15 4 15 99 0 0]
                                      [4 3 2 1 0])
                       0)))))
-            #_(is (= 139629729
+            (is (= 139629729
                      (final-output
                       (run-multiple-until-done
                        (add-first-input
                         (amplifier-vec [3 26 1001 26 -4 26 3 27 1002 27 2 27 1 27 26 27 4 27 1001 28 -1 28 1005 28 6 99 0 0 5]
                                        [9 8 7 6 5])
                         0)))))
-            #_(is (= 18216
+            (is (= 18216
                    (final-output
                     (run-multiple-until-done
                      (add-first-input
@@ -292,14 +297,6 @@
                (run-multiple-until-done)
                (final-output)))))
 
-(comment (->> (iterate run-multiple
-                       (add-first-input
-                        (amplifier-vec [3 26 1001 26 -4 26 3 27 1002 27 2 27 1 27 26 27 4 27 1001 28 -1 28 1005 28 6 99 0 0 5]
-                                       [9 8 7 6 5])
-                        0))
-              (take 5)
-              (last)))
-
 (defn day7-1
   {:test #(is (= 272368 (day7-1)))}
   []
@@ -307,6 +304,7 @@
       (find-max-amplification (range 5))))
 
 (defn day7-2
+  {:test #(is (= 19741286 (day7-2)))}
   []
   (-> (io/resource "day7") (slurp) (parse)
       (find-max-amplification (range 5 10))))
