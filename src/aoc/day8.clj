@@ -2,7 +2,7 @@
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.string :as string]
-            [clojure.test :refer [is run-tests]]))
+            [clojure.test :refer [is]]))
 
 (defn parse-layers
   {:test #(is (=  '((0 2 2 2) (1 1 2 2) (2 2 1 2) (0 0 0 0))
@@ -52,5 +52,3 @@
   (-> (io/resource "day8") (slurp) (parse-layers 25 6)
       (display 25 6)
       (println)))
-
-(run-tests)

@@ -1,5 +1,5 @@
 (ns aoc.day4
-  (:require [clojure.test :refer [run-tests is]]))
+  (:require [clojure.test :refer [is]]))
 
 (defn digits->number
   {:test #(is (= 17 (digits->number [1 7])))}
@@ -57,5 +57,3 @@
   {:test #(is (= 1133 (day4b)))}
   []
   (count (possibilities-within-b 206938 679128)))
-
-(run-tests)

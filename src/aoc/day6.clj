@@ -2,7 +2,7 @@
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.string :as string]
-            [clojure.test :refer [is run-tests]]))
+            [clojure.test :refer [is]]))
 
 (defn parse
   {:test #(is (= {:B :A :C :B}
@@ -61,5 +61,3 @@
       (slurp)
       (parse)
       (length-between :YOU :SAN)))
-
-(run-tests)
