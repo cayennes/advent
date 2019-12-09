@@ -2,6 +2,14 @@
   (:require [clojure.test :refer [deftest is]]
             [aoc.intcode-computer :as ic]))
 
+(deftest day-2-1-examples ;; incomplete
+  (is (= 3500
+         (-> [1 9 10 3 2 3 11 0 99 30 40 50]
+             ic/new-computer
+             ic/exec-all
+             :program
+             first))))
+
 (deftest op-3-works
   (is (= [16 0 99]
          (:program (ic/exec-once (ic/new-computer [3 0 99] [16])))))
@@ -28,6 +36,17 @@
 
 (comment "day2-2 result is slower than I want to test"
   (= 5398 (ic/day2-2)))
+
+(deftest parameter-mode-works
+  (is (= 0 (ic/parameter-mode 1002 1))
+      (= 1 (ic/parameter-mode 1006 2))))
+
+(deftest day-5-1-examples ;; incomplete
+  (is (= [1000]
+         (-> [3 21 1008 21 8 20 1005 20 22 107 8 21 20 1006 20 31 1106 0 36 98 0 0 1002 21 125 20 4 20 1105 1 46 104 999 1105 1 46 1101 1000 1 20 4 20 1105 1 46 98 99]
+             (ic/new-computer [8])
+             (ic/exec-all)
+             (:output)))))
 
 (deftest day5-1-result
   (is (= 15314507 (ic/day5-1))))

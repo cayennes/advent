@@ -12,29 +12,29 @@
   (mod (get program position)
        100))
 
-(defn immediate-mode?
- [op n]
- (pos? 
-  (mod (quot op (* 100 n))
-   10)))
+(defn parameter-mode
+  [op n]
+  (mod (quot op (int (Math/pow 10 (inc n)))) 10))
 
 (defn read-parameter
-  [program position n raw?]
+  [{:keys [program position relative-offset]} n raw?]
   (let [op (get program position)
         raw-arg (get program (+ n position))]
-    (if (or raw?
-            (immediate-mode? op n))
+    (if raw?
       raw-arg
-      (get program raw-arg))))
+      (case (parameter-mode op n)
+        0 (get program raw-arg) ;; position
+        1 raw-arg ;; immediate
+        2 (get program (+ relative-offset raw-arg)))))) ;; relative
 
 (defn binary-op
-  [{:keys [position] :as computer} f]
+  [computer f]
   (-> computer
       (update :program
               #(assoc %
-                      (read-parameter % position 3 true)
-                      (f (read-parameter % position 1 false)
-                         (read-parameter % position 2 false))))
+                      (read-parameter computer 3 true)
+                      (f (read-parameter computer 1 false)
+                         (read-parameter computer 2 false))))
       (update :position #(+ 4 %))))
 
 (defn new-computer
@@ -58,34 +58,34 @@
 
 ;; read input
 (defmethod exec-once 3
-  [{:keys [position input] :as computer}]
+  [{:keys [input] :as computer}]
   (if (empty? input)
     (assoc computer :awaiting-input true)
     (-> computer
         (dissoc :awaiting-input)
         (update :program
                 #(assoc %
-                        (read-parameter % position 1 true)
+                        (read-parameter computer 1 true)
                         (first input)))
         (update :input rest)
         (update :position + 2))))
 
 (defmethod exec-once 4
-  [{:keys [program position] :as computer}]
+  [computer]
   (-> computer
-      (update :output conj (read-parameter program position 1 false))
+      (update :output conj (read-parameter computer 1 false))
       (update :position + 2)))
 
 (defmethod exec-once 5
-  [{:keys [program position] :as computer}]
-  (if (not= 0 (read-parameter program position 1 false))
-    (assoc computer :position (read-parameter program position 2 false))
+  [computer]
+  (if (not= 0 (read-parameter computer 1 false))
+    (assoc computer :position (read-parameter computer 2 false))
     (update computer :position + 3)))
 
 (defmethod exec-once 6
-  [{:keys [program position] :as computer}]
-  (if (= 0 (read-parameter program position 1 false))
-    (assoc computer :position (read-parameter program position 2 false))
+  [computer]
+  (if (= 0 (read-parameter computer 1 false))
+    (assoc computer :position (read-parameter computer 2 false))
     (update computer :position + 3)))
 
 (defmethod exec-once 7
