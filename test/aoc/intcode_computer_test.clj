@@ -133,3 +133,19 @@
 
 (deftest day7-2-result
   (is (= 19741286 (ic/day7-2))))
+
+(deftest relative-mode-works
+  (is (= [109 1 36 2 203 0 99]
+         (-> (ic/new-computer [109 1 109 2 203 0 99] [36])
+             (ic/exec-all)
+             (:program))))
+  (is (= [109 6 2202 1 2 3 99 10 11 110]
+         (-> (ic/new-computer [109 6 22202 1 2 3 99 10 11 0])
+             (ic/exec-all)
+             (:program)))))
+
+(deftest day9-examples
+  (let [quine [109 1 204 -1 1001 100 1 100 1008 100 16 101 1006 101 0 99]]
+    (is (= quine (-> quine ic/new-computer ic/exec-all :output))))
+  (is (= [1219070632396864] (-> [1102 34915192 34915192 7 4 7 99 0] ic/new-computer ic/exec-all :output)))
+  (is (= [1125899906842624] (-> [104 1125899906842624 99] ic/new-computer ic/exec-all :output))))

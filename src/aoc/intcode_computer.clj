@@ -16,25 +16,39 @@
   [op n]
   (mod (quot op (int (Math/pow 10 (inc n)))) 10))
 
+(defn read-memory
+  [program n]
+  (get program n (if (>= n 0) 0)))
+
 (defn read-parameter
-  [{:keys [program position relative-offset]} n raw?]
-  (let [op (get program position)
-        raw-arg (get program (+ n position))]
-    (if raw?
-      raw-arg
-      (case (parameter-mode op n)
-        0 (get program raw-arg) ;; position
-        1 raw-arg ;; immediate
-        2 (get program (+ relative-offset raw-arg)))))) ;; relative
+  [{:keys [program position relative-base]} n write?]
+  (let [op (read-memory program position)
+        raw-arg (read-memory program (+ n position))]
+    (case (parameter-mode op n)
+      0 (if write?
+          raw-arg
+          (read-memory program raw-arg)) ;; position
+      1 raw-arg ;; immediate
+      2 (read-memory program (+ relative-base raw-arg))))) ;; relative
+
+(defn double-memory
+  [program]
+  (vec (concat program (repeat (count program) 0))))
+
+(defn write-memory
+  [program n val]
+  (cond
+    (<= n (count program)) (assoc program n val)
+    (pos? n) (-> program (double-memory) (recur n val))))
 
 (defn binary-op
   [computer f]
   (-> computer
       (update :program
-              #(assoc %
-                      (read-parameter computer 3 true)
-                      (f (read-parameter computer 1 false)
-                         (read-parameter computer 2 false))))
+              #(write-memory %
+                             (read-parameter computer 3 true)
+                             (f (read-parameter computer 1 false)
+                                (read-parameter computer 2 false))))
       (update :position #(+ 4 %))))
 
 (defn new-computer
@@ -42,7 +56,8 @@
    {:program program
     :position 0
     :input (or input [])
-    :output []})
+    :output []
+    :relative-base 0})
   ([program]
    (new-computer program [])))
 
@@ -64,9 +79,9 @@
     (-> computer
         (dissoc :awaiting-input)
         (update :program
-                #(assoc %
-                        (read-parameter computer 1 true)
-                        (first input)))
+                #(write-memory %
+                               (read-parameter computer 1 true)
+                               (first input)))
         (update :input rest)
         (update :position + 2))))
 
@@ -95,6 +110,14 @@
 (defmethod exec-once 8
   [computer]
   (binary-op computer #(if (= %1 %2) 1 0)))
+
+;; update relative base
+(defmethod exec-once 9
+  [computer]
+  (-> computer
+      (update :relative-base
+              + (read-parameter computer 1 false))
+      (update :position + 2)))
 
 (defmethod exec-once 99
   [computer]
@@ -215,3 +238,10 @@
   []
   (-> (io/resource "day7") (slurp) (parse)
       (find-max-amplification (range 5 10))))
+
+(defn day9-1
+  []
+  (-> (io/resource "day9") (slurp) (parse)
+      (new-computer [1])
+      (exec-all)
+      (:output)))
