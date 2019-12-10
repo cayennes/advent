@@ -8,16 +8,10 @@
               (is (= #{[1 0] [4 0] [0 2] [1 2] [2 2] [3 2] [4 2] [4 3] [3 4] [4 4]}
                      (set (list-asteroids ".#..#\n.....\n#####\n....#\n...##")))))}
   [diagram-string]
-  (filter some?
-          (apply concat
-                 (map-indexed
-                  (fn [y row]
-                    (map-indexed
-                     (fn [x ch]
-                       (if (= \# ch)
-                         [x y]))
-                     row))
-                  (string/split diagram-string #"\n")))))
+  (for [[y row] (map-indexed list (string/split diagram-string #"\n"))
+        [x ch] (map-indexed list row)
+        :when (= \# ch)]
+      [x y]))
 
 (defn angle
   [[base-x base-y] [asteroid-x asteroid-y]]
@@ -33,7 +27,7 @@
       :down)
 
     :else [(/ (- asteroid-x base-x) (- asteroid-y base-y))
-           (if (< asteroid-x base-x) :left-side :right-side)]))
+           (if (< base-x asteroid-x) :right-side :left-side)]))
 
 (defn asteroid-direction
   [asteroids base]
