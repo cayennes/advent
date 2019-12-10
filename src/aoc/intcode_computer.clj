@@ -30,7 +30,9 @@
                   raw-arg
                   (read-memory program raw-arg))
       :immediate raw-arg
-      :relative (read-memory program (+ relative-base raw-arg)))))
+      :relative (if write?
+                  (+ relative-base raw-arg)
+                  (read-memory program (+ relative-base raw-arg))))))
 
 (defn increase-memory
   [program n]
@@ -248,3 +250,11 @@
       (new-computer [1])
       (exec-all)
       (:output)))
+
+(defn day9-2
+  []
+  (-> (io/resource "day9") (slurp) (parse)
+      (new-computer [2])
+      (exec-all)
+      (:output)
+      (last)))

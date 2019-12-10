@@ -152,3 +152,9 @@
     (is (= quine (-> quine ic/new-computer ic/exec-all :output))))
   (is (= [1219070632396864] (-> [1102 34915192 34915192 7 4 7 99 0] ic/new-computer ic/exec-all :output)))
   (is (= [1125899906842624] (-> [104 1125899906842624 99] ic/new-computer ic/exec-all :output))))
+
+(deftest day9-1-result
+  (is (= [2436480432] (ic/day9-1))))
+
+(comment "slow"
+  (= 45710 (ic/day9-2)))
