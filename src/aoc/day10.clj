@@ -42,57 +42,78 @@
        (group-by #(angle base %))))
 
 (defn find-best-location
-  {:test #(is (= 8 (find-best-location [[1 0] [4 0] [0 2] [1 2] [2 2] [3 2] [4 2] [4 3] [3 4] [4 4]])))}
+  {:test #(is (= {:count 8, :location [3 4]}
+                 (find-best-location [[1 0] [4 0] [0 2] [1 2] [2 2] [3 2] [4 2] [4 3] [3 4] [4 4]])))}
   [asteroids]
-  (apply max (map #(count (asteroid-direction asteroids %))
-                  asteroids)))
+  (apply max-key :count
+         (map #(array-map :count (count (asteroid-direction asteroids %))
+                          :location %)
+              asteroids)))
 
 (deftest day10-1-examples
-  (is (= 33
+  (is (= {:count 33, :location [5 8]}
          (-> "......#.#.\n#..#.#....\n..#######.\n.#.#.###..\n.#..#.....\n..#....#.#\n#..#....#.\n.##.#..###\n##...#..#.\n.#....####"
              list-asteroids
              find-best-location)))
 
-  (is (= 35
+  (is (= {:count 35, :location [1 2]}
          (-> "#.#...#.#.\n.###....#.\n.#....#...\n##.#.#.#.#\n....#.#.#.\n.##..###.#\n..#...##..\n..##....##\n......#...\n.####.###."
              list-asteroids
              find-best-location)))
-  (is (= 41
+  (is (= {:count 41, :location [6 3]}
          (-> ".#..#..###\n####.###.#\n....###.#.\n..###.##.#\n##.##.#.#.\n....###..#\n..#.#..#.#\n#..#.#.###\n.##...##.#\n.....#.#.."
              list-asteroids
              find-best-location)))
-  (is (= 210
+  (is (= {:count 210, :location [11 13]}
          (-> ".#..##.###...#######\n##.############..##.\n.#.######.########.#\n.###.#######.####.#.\n#####.##.#.##.###.##\n..#####..#.#########\n####################\n#.####....###.#.#.##\n##.#################\n#####.##.###..####..\n..######..##.#######\n####.##.####...##..#\n.#####..#.######.###\n##...#.##########...\n#.##########.#######\n.####.#.###.###.#.##\n....##.##.###..#####\n.#.#.###########.###\n#.#.#.#####.####.###\n###.##.####.##.#..##"
             list-asteroids
             find-best-location))))
 
 (defn day10-1
-  {:test #(is (= 309 (day10-1)))}
+  {:test #(is (= {:count 309, :location [37 25]} (day10-1)))}
   []
   (-> (io/resource "day10") (slurp)
       (list-asteroids)
       (find-best-location)))
 
-(defn filter-keys
-  [f m]
-  (select-keys m (filter f (keys m))))
+(defn ordered-asteroid-groups-in-quadrant
+  {:test #(is (= [[[0 0]]]
+                 (ordered-asteroid-groups-in-quadrant {[1 :left-side] [[0 0]]}
+                                                      true false)))}
+  [groups top? right?]
+  (->> (select-keys groups
+                    (filter #(and (vector? %)
+                                  ((if top? neg? pos?) (first %))
+                                  (= (if right? :right-side :left-side) (second %)))
+                            (keys groups)))
+       (sort-by #(* (if right? -1 1) (first (first %))))
+       (map second)))
 
 (defn vaporization-order
-  [asteroids base]
+  [base asteroids]
   (let [directions (asteroid-direction asteroids base)
         groups-in-order (concat [(:up directions)]
-                                (filter-keys #(and (pos? (first %)) (= :right (second %))) directions)
+                                (ordered-asteroid-groups-in-quadrant directions true true)
                                 [(:right directions)]
-                                (filter-keys #(and (neg? (first %)) (= :right (second %))) directions)
+                                (ordered-asteroid-groups-in-quadrant directions false true)
                                 [(:down directions)]
-                                (filter-keys #(and (pos? (first %)) (= :left (second %))) directions)
+                                (ordered-asteroid-groups-in-quadrant directions false false)
                                 [(:left directions)]
-                                (filter-keys #(and (neg? (first %)) (= :left (second %)))) directions)]
+                                (ordered-asteroid-groups-in-quadrant directions true false))]
     (mapcat sort groups-in-order)))
+
+(deftest day10-2-examples
+  (is (= :TODO
+         (->> ".#....#####...#..\n##...##.#####..##\n##...#...#.#####.\n..#.....X...###..\n..#.#.....#....##"
+             (list-asteroids)
+             (vaporization-order [9 4])
+             (take 9)))))
 
 (defn day10-2
   []
-  (-> (io/resource "day10") (slurp)
-      (vaporization-order :TODO-need-base)
-      (drop 199)
-      (first)))
+  (->> (io/resource "day10") (slurp)
+       (list-asteroids)
+       (vaporization-order [37 25])
+       (drop 199)
+       (first)
+       (#(+ (* 100 (first %)) (second %)))))
