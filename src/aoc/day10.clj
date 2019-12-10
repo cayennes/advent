@@ -89,6 +89,15 @@
        (sort-by #(* (if right? -1 1) (first (first %))))
        (map second)))
 
+(defn zipseqs
+  {:test #(is (= [[0 0] [1 nil]]
+                 (zipseqs (range 2) (range 1))))}
+  [& seqs]
+  (->> seqs
+       (map #(concat % (repeat nil)))
+       (apply map vector)
+       (take-while #(some some? %))))
+
 (defn vaporization-order
   [base asteroids]
   (let [directions (asteroid-direction asteroids base)
@@ -100,10 +109,14 @@
                                 (ordered-asteroid-groups-in-quadrant directions false false)
                                 [(:left directions)]
                                 (ordered-asteroid-groups-in-quadrant directions true false))]
-    (mapcat sort groups-in-order)))
+    (->> groups-in-order
+         (map sort)
+         (apply zipseqs)
+         (apply concat)
+         (filter some?))))
 
 (deftest day10-2-examples
-  (is (= :TODO
+  (is (= [[10 0] [10 1] [11 0] :TODO]
          (->> ".#....#####...#..\n##...##.#####..##\n##...#...#.#####.\n..#.....X...###..\n..#.#.....#....##"
              (list-asteroids)
              (vaporization-order [9 4])
