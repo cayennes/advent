@@ -14,7 +14,8 @@
 
 (defn parameter-mode
   [op n]
-  (mod (quot op (int (Math/pow 10 (inc n)))) 10))
+  ({0 :position 1 :immediate 2 :relative}
+   (mod (quot op (int (Math/pow 10 (inc n)))) 10)))
 
 (defn read-memory
   [program n]
@@ -25,21 +26,22 @@
   (let [op (read-memory program position)
         raw-arg (read-memory program (+ n position))]
     (case (parameter-mode op n)
-      0 (if write?
-          raw-arg
-          (read-memory program raw-arg)) ;; position
-      1 raw-arg ;; immediate
-      2 (read-memory program (+ relative-base raw-arg))))) ;; relative
+      :position (if write?
+                  raw-arg
+                  (read-memory program raw-arg))
+      :immediate raw-arg
+      :relative (read-memory program (+ relative-base raw-arg)))))
 
-(defn double-memory
-  [program]
-  (vec (concat program (repeat (count program) 0))))
+(defn increase-memory
+  [program n]
+  (vec (concat program (repeat n 0))))
 
 (defn write-memory
   [program n val]
   (cond
     (<= n (count program)) (assoc program n val)
-    (pos? n) (-> program (double-memory) (recur n val))))
+    ;; make program vector much bigger so we don't have to do this repeatedly
+    (pos? n) (-> program (increase-memory n) (assoc n val))))
 
 (defn binary-op
   [computer f]
@@ -85,6 +87,7 @@
         (update :input rest)
         (update :position + 2))))
 
+;; write output
 (defmethod exec-once 4
   [computer]
   (-> computer

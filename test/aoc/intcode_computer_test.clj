@@ -38,8 +38,9 @@
   (= 5398 (ic/day2-2)))
 
 (deftest parameter-mode-works
-  (is (= 0 (ic/parameter-mode 1002 1))
-      (= 1 (ic/parameter-mode 1006 2))))
+  (is (= :position (ic/parameter-mode 1002 1)))
+  (is (= :immediate (ic/parameter-mode 1006 2)))
+  (is (= :relative (ic/parameter-mode 203 1))))
 
 (deftest day-5-1-examples ;; incomplete
   (is (= [1000]
@@ -135,11 +136,13 @@
   (is (= 19741286 (ic/day7-2))))
 
 (deftest relative-mode-works
-  (is (= [109 1 36 2 203 0 99]
-         (-> (ic/new-computer [109 1 109 2 203 0 99] [36])
+  (is (= 6 (-> [109 5 109 1 99] ic/new-computer ic/exec-all :relative-base)))
+  (is (= [204] (-> [109 1 204 1 99] ic/new-computer ic/exec-all :output)))
+  (is (= [109 36 203 0 99]
+         (-> (ic/new-computer [109 1 203 0 99] [36])
              (ic/exec-all)
              (:program))))
-  (is (= [109 6 2202 1 2 3 99 10 11 110]
+  (is (= [109 6 22202 1 2 3 99 10 11 110]
          (-> (ic/new-computer [109 6 22202 1 2 3 99 10 11 0])
              (ic/exec-all)
              (:program)))))
