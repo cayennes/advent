@@ -24,16 +24,16 @@
   (cond
     (= asteroid-y base-y)
     (if (< base-x asteroid-x)
-      :pos-flat
-      :neg-flat)
+      :right
+      :left)
 
     (= asteroid-x base-x)
     (if (< base-y asteroid-y)
-      :pos-vert
-      :neg-vert)
+      :up
+      :down)
 
     :else [(/ (- asteroid-x base-x) (- asteroid-y base-y))
-           (< asteroid-x base-x)]))
+           (if (< asteroid-x base-x) :left-side :right-side)]))
 
 (defn asteroid-direction
   [asteroids base]
@@ -72,3 +72,27 @@
   (-> (io/resource "day10") (slurp)
       (list-asteroids)
       (find-best-location)))
+
+(defn filter-keys
+  [f m]
+  (select-keys m (filter f (keys m))))
+
+(defn vaporization-order
+  [asteroids base]
+  (let [directions (asteroid-direction asteroids base)
+        groups-in-order (concat [(:up directions)]
+                                (filter-keys #(and (pos? (first %)) (= :right (second %))) directions)
+                                [(:right directions)]
+                                (filter-keys #(and (neg? (first %)) (= :right (second %))) directions)
+                                [(:down directions)]
+                                (filter-keys #(and (pos? (first %)) (= :left (second %))) directions)
+                                [(:left directions)]
+                                (filter-keys #(and (neg? (first %)) (= :left (second %)))) directions)]
+    (mapcat sort groups-in-order)))
+
+(defn day10-2
+  []
+  (-> (io/resource "day10") (slurp)
+      (vaporization-order :TODO-need-base)
+      (drop 199)
+      (first)))
