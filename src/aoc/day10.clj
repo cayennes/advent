@@ -19,10 +19,10 @@
               (is (= :down (angle [4 4] [4 5])))
               (is (= :right (angle [4 4] [6 4])))
               (is (= :left (angle [4 4] [2 4])))
-              (is (= [-1 :right-side (angle [4 4] [5 3])]))
-              (is (= [1 :right-side (angle [4 4] [5 5])]))
-              (is (= [1 :left-side (angle [4 4] [3 5])]))
-              (is (= [-1 :left-side (angle [4 4] [3 3])])))}
+              (is (= [-1 :right-side] (angle [4 4] [5 3])))
+              (is (= [1 :right-side] (angle [4 4] [5 5])))
+              (is (= [-1 :left-side] (angle [4 4] [3 5])))
+              (is (= [1 :left-side] (angle [4 4] [3 3]))))}
   [[base-x base-y] [asteroid-x asteroid-y]]
   (cond
     (= asteroid-y base-y)
@@ -35,7 +35,7 @@
       :up
       :down)
 
-    :else [(/ (- asteroid-x base-x) (- asteroid-y base-y))
+    :else [(/ (- asteroid-y base-y) (- asteroid-x base-x))
            (if (< base-x asteroid-x) :right-side :left-side)]))
 
 (defn by-direction
@@ -81,20 +81,22 @@
 
 (defn ordered-asteroid-groups-in-quadrant
   {:test #(do (is (= [[[0 0]]]
-                  (ordered-asteroid-groups-in-quadrant {[-1 :left-side] [[0 0]]
-                                                        {1 :right-side} [2 2]}
+                  (ordered-asteroid-groups-in-quadrant {[1 :left-side] [[0 0]]
+                                                        [1 :right-side] [[2 2]]}
                                                        true false)))
               (is (= [[[2 2]]]
-                     (ordered-asteroid-groups-in-quadrant {[-1 :left-side] [[0 0]]
-                                                           {1 :right-side} [2 2]}
+                     (ordered-asteroid-groups-in-quadrant {[1 :left-side] [[0 0]]
+                                                           [1 :right-side] [[2 2]]}
                                                           false true))))}
   [groups top? right?]
   (->> (select-keys groups
                     (filter #(and (vector? %)
+                                  ;; top right and bottom left are negative
                                   ((if (= top? right?) neg? pos?) (first %))
                                   (= (if right? :right-side :left-side) (second %)))
                             (keys groups)))
-       (sort-by #(* -1 (first (first %))))
+       ;; first is the key, first of that is the slope
+       (sort-by #(first (first %)))
        (map second)))
 
 (defn zipseqs
@@ -131,20 +133,13 @@
          (apply concat)
          (filter some?))))
 
-(comment
-    (->> ".#....#####...#..\n##...##.#####..##\n##...#...#.#####.\n..#.....#...###..\n..#.#.....#....##"
-         (list-asteroids)
-         (by-direction [8 4])
-         :up
-         #_(map (partial sort-by (partial distance-ish-from [9 4])))))
-
 (deftest day10-2-examples
   (is (= [[8 1] [9 0] [9 1] [10 0] [9 2] [11 1] [12 1] [11 2] [15 1]]
          (->> ".#....#####...#..\n##...##.#####..##\n##...#...#.#####.\n..#.....#...###..\n..#.#.....#....##"
               (list-asteroids)
               (vaporization-order [8 3])
               (take 9))))
-  (is (= [4 5]
+  (is (= [4 4]
          (->> ".#....#####...#..\n##...##.#####..##\n##...#...#.#####.\n..#.....#...###..\n..#.#.....#....##"
               (list-asteroids)
               (vaporization-order [8 3])
@@ -152,6 +147,7 @@
               (first)))))
 
 (defn day10-2
+  {:test #(is (= 416 (day10-2)))}
   []
   (->> (io/resource "day10") (slurp)
        (list-asteroids)
