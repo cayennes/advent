@@ -18,7 +18,11 @@
   {:test #(do (is (= :up (angle [4 4] [4 0])))
               (is (= :down (angle [4 4] [4 5])))
               (is (= :right (angle [4 4] [6 4])))
-              (is (= :left (angle [4 4] [2 4]))))}
+              (is (= :left (angle [4 4] [2 4])))
+              (is (= [-1 :right-side (angle [4 4] [5 3])]))
+              (is (= [1 :right-side (angle [4 4] [5 5])]))
+              (is (= [1 :left-side (angle [4 4] [3 5])]))
+              (is (= [-1 :left-side (angle [4 4] [3 3])])))}
   [[base-x base-y] [asteroid-x asteroid-y]]
   (cond
     (= asteroid-y base-y)
@@ -76,17 +80,21 @@
       (find-best-location)))
 
 (defn ordered-asteroid-groups-in-quadrant
-  {:test #(is (= [[[0 0]]]
-                 (ordered-asteroid-groups-in-quadrant {[1 :left-side] [[0 0]]}
-                                                      true false)))}
+  {:test #(do (is (= [[[0 0]]]
+                  (ordered-asteroid-groups-in-quadrant {[-1 :left-side] [[0 0]]
+                                                        {1 :right-side} [2 2]}
+                                                       true false)))
+              (is (= [[[2 2]]]
+                     (ordered-asteroid-groups-in-quadrant {[-1 :left-side] [[0 0]]
+                                                           {1 :right-side} [2 2]}
+                                                          false true))))}
   [groups top? right?]
   (->> (select-keys groups
                     (filter #(and (vector? %)
-                                  ((if right? neg? pos?) (first %))
+                                  ((if (= top? right?) neg? pos?) (first %))
                                   (= (if right? :right-side :left-side) (second %)))
                             (keys groups)))
-       ;; TODO actually need a more complicated function; need to take reciprical in some quadrants
-       (sort-by #(* (if right? -1 1) (first (first %))))
+       (sort-by #(* -1 (first (first %))))
        (map second)))
 
 (defn zipseqs
