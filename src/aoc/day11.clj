@@ -1,5 +1,6 @@
 (ns aoc.day11
   (:require [aoc.intcode-computer :as ic]
+            [clojure.string :as string]
             [clojure.java.io :as io]))
 
 (defn rotate
@@ -29,10 +30,10 @@
      :robot (move-robot robot rotation-code)}))
 
 (defn do-everything
-  [program]
-  (->> {:hull {}
-             :robot {:position [0 0]
-                     :orientation [-1 0]}
+  [program initial-hull]
+  (->> {:hull initial-hull
+        :robot {:position [0 0]
+                :orientation [-1 0]}
         :computer (ic/new-computer program)}
        (iterate do-stuff)
        (drop-while #(not (get-in % [:computer :halt])))
@@ -41,6 +42,27 @@
 (defn day11-1
   []
   (-> (io/resource "day11") (slurp) (ic/parse)
-      (do-everything)
-      :hull
+      (do-everything {})
+      (:hull)
       (count)))
+
+(defn show-hull
+  [hull]
+  (string/join
+   "\n"
+   (for [x (range (apply min (map first (keys hull)))
+                  (inc (apply max (map first (keys hull)))))]
+     (apply str (for [y (range (apply min (map second (keys hull)))
+                               (inc (apply max (map second (keys hull)))))]
+                  (case (first (get hull [x y] [0]))
+                    0 "."
+                    1 "#"))))))
+
+(defn day11-2
+  []
+  (-> (io/resource "day11") (slurp) (ic/parse)
+      (do-everything {[0 0] '(1)})
+      (:hull)
+      (show-hull)
+      (println)))
+;; turns out my robot is doing everything backwards. good enough.
