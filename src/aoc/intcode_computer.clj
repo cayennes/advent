@@ -195,7 +195,7 @@
 
 (defn add-first-input
   [computers input]
-  (update-in computers [0 :input] #(concat % [input])))
+  (update computers 0 add-input input))
 
 (defn run-multiple
   [computers]

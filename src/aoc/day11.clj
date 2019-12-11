@@ -8,26 +8,25 @@
     0 [y (- x)]
     1 [(- y) x]))
 
-(defn read-color
-  [hull position]
-  (get hull position 0))
+(defn move-robot
+  [robot rotation-code]
+  (let [new-orientation (rotate (:orientation robot) rotation-code)]
+    (-> robot
+        (assoc :orientation new-orientation)
+        (update :position #(map + % new-orientation)))))
 
 (defn last-two
   [s]
   (->> s reverse (take 2) reverse))
 
 (defn do-stuff
-  [{:keys [robot hull computer] :as world}]
-  (let [current-color (read-color hull (:position robot))
-        new-computer (-> computer (ic/add-input current-color) (ic/exec-all))
-        [paint turn] (-> new-computer :output last-two)
-        new-orientation (rotate (:position robot) turn)]
-    (println robot new-orientation turn)
-    (-> world
-        (assoc :computer new-computer)
-        (update-in [:hull (:position robot)] conj  paint)
-        (assoc-in [:robot :orientation] new-orientation)
-        (update-in [:robot :position] #(map + %1 %2) new-orientation))))
+  [{:keys [robot hull computer]}]
+  (let [current-color (first (get hull (:position robot) [0]))
+        next-computer (-> computer (ic/add-input current-color) (ic/exec-all))
+        [paint-color rotation-code] (-> next-computer :output last-two)]
+    {:computer next-computer
+     :hull (update hull (:position robot) conj paint-color)
+     :robot (move-robot robot rotation-code)}))
 
 (defn do-everything
   [program]
@@ -42,6 +41,6 @@
 (defn day11-1
   []
   (-> (io/resource "day11") (slurp) (ic/parse)
-      (do-everything)))
-
-(day11-1)
+      (do-everything)
+      :hull
+      (count)))

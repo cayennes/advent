@@ -75,8 +75,11 @@
 (deftest day5-2-result
   (is (= 652726 (ic/day5-2))))
 
+(deftest add-input-works
+  (is (= {:input [1 2]} (ic/add-input {:input [1]} 2))))
+
 (deftest add-first-input-works
-  (is [{:input [1 2]}] (ic/add-first-input [{:input [1]}] 2)))
+  (is (= [{:input [1 2]}] (ic/add-first-input [{:input [1]}] 2))))
 
 (deftest run-multiple-works
   (is (= 43210
