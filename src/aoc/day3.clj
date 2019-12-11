@@ -1,5 +1,6 @@
 (ns aoc.day3
-  (:require [clojure.edn :as edn]
+  (:require [aoc.util :as u]
+            [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.set :as set]
             [clojure.string :as string]))
@@ -45,13 +46,11 @@
          set/union
          (map-indexed #(wire-diagram %2 %1) wires)))
 
-(defn abs [n] (max n (- n)))
-
 (defn closest-intersection
   [diagram]
   (first (for [d (range 1 100000)
                x (range (- d) (inc d))
-               y [(- d (abs x)) (- (abs x) d)]
+               y [(- d (u/abs x)) (- (u/abs x) d)]
                :when (> (count (get diagram [x y]))
                         1)]
            d)))

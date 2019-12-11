@@ -1,5 +1,6 @@
 (ns aoc.day10
-  (:require [clojure.java.io :as io]
+  (:require [aoc.util :as u]
+            [clojure.java.io :as io]
             [clojure.string :as string]
             [clojure.test :refer [is deftest]]))
 
@@ -14,6 +15,10 @@
       [x y]))
 
 (defn angle
+  {:test #(do (is (= :up (angle [4 4] [4 0])))
+              (is (= :down (angle [4 4] [4 5])))
+              (is (= :right (angle [4 4] [6 4])))
+              (is (= :left (angle [4 4] [2 4]))))}
   [[base-x base-y] [asteroid-x asteroid-y]]
   (cond
     (= asteroid-y base-y)
@@ -22,15 +27,15 @@
       :left)
 
     (= asteroid-x base-x)
-    (if (< base-y asteroid-y)
+    (if (< asteroid-y base-y)
       :up
       :down)
 
     :else [(/ (- asteroid-x base-x) (- asteroid-y base-y))
            (if (< base-x asteroid-x) :right-side :left-side)]))
 
-(defn asteroid-direction
-  [asteroids base]
+(defn by-direction
+  [base asteroids]
   (->> asteroids
        (filter #(not= base %))
        (group-by #(angle base %))))
@@ -40,7 +45,7 @@
                  (find-best-location [[1 0] [4 0] [0 2] [1 2] [2 2] [3 2] [4 2] [4 3] [3 4] [4 4]])))}
   [asteroids]
   (apply max-key :count
-         (map #(array-map :count (count (asteroid-direction asteroids %))
+         (map #(array-map :count (count (by-direction % asteroids))
                           :location %)
               asteroids)))
 
@@ -77,9 +82,10 @@
   [groups top? right?]
   (->> (select-keys groups
                     (filter #(and (vector? %)
-                                  ((if top? neg? pos?) (first %))
+                                  ((if right? neg? pos?) (first %))
                                   (= (if right? :right-side :left-side) (second %)))
                             (keys groups)))
+       ;; TODO actually need a more complicated function; need to take reciprical in some quadrants
        (sort-by #(* (if right? -1 1) (first (first %))))
        (map second)))
 
@@ -92,9 +98,17 @@
        (apply map vector)
        (take-while #(some some? %))))
 
+(defn distance-ish-from
+  "comparable distance for asteroids at the same angle"
+  {:test #(is (= 1 (distance-ish-from [0 0] [1 0])))}
+  [[base-x base-y] [asteroid-x asteroid-y]]
+  (if (= base-x asteroid-x)
+    (u/abs (- base-y asteroid-y))
+    (u/abs (- base-x asteroid-x))))
+
 (defn vaporization-order
   [base asteroids]
-  (let [directions (asteroid-direction asteroids base)
+  (let [directions (by-direction base asteroids)
         groups-in-order (concat [(:up directions)]
                                 (ordered-asteroid-groups-in-quadrant directions true true)
                                 [(:right directions)]
@@ -104,17 +118,30 @@
                                 [(:left directions)]
                                 (ordered-asteroid-groups-in-quadrant directions true false))]
     (->> groups-in-order
-         (map sort)
+         (map (partial sort-by (partial distance-ish-from base)))
          (apply zipseqs)
          (apply concat)
          (filter some?))))
 
+(comment
+    (->> ".#....#####...#..\n##...##.#####..##\n##...#...#.#####.\n..#.....#...###..\n..#.#.....#....##"
+         (list-asteroids)
+         (by-direction [8 4])
+         :up
+         #_(map (partial sort-by (partial distance-ish-from [9 4])))))
+
 (deftest day10-2-examples
-  (is (= [[10 0] [10 1] [11 0] :TODO]
-         (->> ".#....#####...#..\n##...##.#####..##\n##...#...#.#####.\n..#.....X...###..\n..#.#.....#....##"
-             (list-asteroids)
-             (vaporization-order [9 4])
-             (take 9)))))
+  (is (= [[8 1] [9 0] [9 1] [10 0] [9 2] [11 1] [12 1] [11 2] [15 1]]
+         (->> ".#....#####...#..\n##...##.#####..##\n##...#...#.#####.\n..#.....#...###..\n..#.#.....#....##"
+              (list-asteroids)
+              (vaporization-order [8 3])
+              (take 9))))
+  (is (= [4 5]
+         (->> ".#....#####...#..\n##...##.#####..##\n##...#...#.#####.\n..#.....#...###..\n..#.#.....#....##"
+              (list-asteroids)
+              (vaporization-order [8 3])
+              (drop 17)
+              (first)))))
 
 (defn day10-2
   []
