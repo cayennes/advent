@@ -189,6 +189,10 @@
   [program phases]
   (mapv #(new-computer program [%]) phases))
 
+(defn add-input
+  [computer input]
+  (update computer :input concat [input]))
+
 (defn add-first-input
   [computers input]
   (update-in computers [0 :input] #(concat % [input])))
