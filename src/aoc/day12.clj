@@ -4,11 +4,11 @@
 
 (defn parse
   [input]
-  {:position (->> input
-                  (re-seq #"x=([-1-9]*).*?y=([-1-9]*).*?z=([-1-9]*)")
-                  (map rest)
-                  (map #(map edn/read-string %)))
-   :velocity 0})
+  (->> input
+       (re-seq #"x=([-1-9]*).*?y=([-1-9]*).*?z=([-1-9]*)")
+       (map rest)
+       (map #(mapv edn/read-string %))
+       (map (fn [p] {:position p :velocity [0 0 0]}))))
 
 (defn sign
   [number]
@@ -19,19 +19,23 @@
 
 (defn update-by
   [this-object other-object]
-  (let [new-velocity (map (fn [tv tp op] (+ tp (sign (- tp op))))
-                          (:velocity this-object)
-                          (:position this-object)
-                          (:position other-object))]
+  (let [new-velocity (mapv (fn [tv tp op] (+ tv (sign (- op tp))))
+                           (:velocity this-object)
+                           (:position this-object)
+                           (:position other-object))]
     {:velocity new-velocity
-     :position (map + (:position this-object) (:velocity this-object))}))
+     :position (mapv + (:position this-object) new-velocity)}))
 
 (defn step
   [objects]
-  (for [this-object objects
-        other-object objects
-        :when (not= this-object other-object)]))
+  (map (fn [object] (reduce update-by object (filter #(not= object %) objects)))
+       objects))
+
+(defn steps
+  [objects n]
+  (nth (iterate step objects) n))
 
 (defn part1
   []
-  (-> (io/resource "day12") (slurp) (parse)))
+  (-> (io/resource "day12") (slurp) (parse)
+      (steps 1000)))
