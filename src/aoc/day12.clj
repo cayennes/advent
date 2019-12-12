@@ -38,9 +38,13 @@
   (map #(-> % (update-velocity objects) (update-position))
        objects))
 
+(defn all-steps
+  [objects]
+  (iterate step objects))
+
 (defn steps
   [objects n]
-  (nth (iterate step objects) n))
+  (nth (all-steps objects) n))
 
 (defn energy
   [{:keys [position velocity]}]
@@ -53,4 +57,25 @@
       (steps 1000)
       (->> (map energy)
            (apply +))))
+
+(defn extract-coord
+  [object coord]
+  (mapv #(get % coord) (vals object)))
+
+(defn loop-size-by-coordinate
+  [object-seq]
+  (loop [[object & more] object-seq
+         seen [#{} #{} #{}]
+         n 0
+         loop-sizes [nil nil nil]]
+    (if (every? some? loop-sizes)
+      loop-sizes
+      (let [seen? (-> (->> (range 3)
+                           (filter #(nil? (loop-sizes %)))
+                           (map #(vector % (extract-coord object %))))
+                      (as-> [coord state] ((seen coord) state)))]
+        (recur more
+               (mapv #(update conj %1 (extract-coord %2)) seen (range 3))
+               (inc n)
+               (mapv #(if (or %1 (if (seen? %2) n)) loop-sizes (range))))))))
 
