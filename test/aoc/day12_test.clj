@@ -4,8 +4,8 @@
 
 (deftest parse-works
   (is (= [{:position [-7 -8 9], :velocity [0 0 0]}
-          {:position [-12 -3 -4], :velocity [0 0 0]}]
-         (d/parse "<x=-7, y=-8, z=9>\n<x=-12, y=-3, z=-4>"))))
+          {:position [-12 0 -4], :velocity [0 0 0]}]
+         (d/parse "<x=-7, y=-8, z=9>\n<x=-12, y=0, z=-4>"))))
 
 (deftest update-by-works
   (is (= {:position [2 3 0] :velocity [1 2 -1]}
@@ -13,10 +13,14 @@
                       {:position [5 3 0] :velocity [1 2 3]}))))
 
 (deftest step-works
-  (is (= [{:position [2 2 2] :velocity [2 2 2]}
-          {:position [2 2 2] :velocity [0 0 0]}]
-         (d/step [{:position [0 0 0] :velocity [1 1 1]}
-                  {:position [2 2 2] :velocity [1 1 1]}]))))
+  (is (= [{:position [2 -1 1] :velocity [3 -1 -1]}
+          {:position [3 -7 -4] :velocity [1 3 3]}
+          {:position [1 -7 5] :velocity [-3 1 -3]}
+          {:position [2 2 0] :velocity [-1 -3 1]}]
+         (d/step [{:position [-1 0 2], :velocity [0 0 0]}
+                  {:position [2 -10 -7], :velocity [0 0 0]}
+                  {:position [4 -8 8], :velocity [0 0 0]}
+                  {:position [3 5 -1], :velocity [0 0 0]}]))))
 
 (deftest steps-works
   (is (= [{:position [2 2 2] :velocity [2 2 2]}
@@ -29,3 +33,12 @@
          (d/steps [{:position [0 0 0] :velocity [1 1 1]}
                    {:position [2 2 2] :velocity [1 1 1]}]
                   2))))
+
+(deftest energy-works
+  (is (= 36 (d/energy {:position [2 1 -3], :velocity [-3 -2 1]})))
+  (is (= 45 (d/energy {:position [1 8 0], :velocity [-1 1 3]})))
+  (is (= 80 (d/energy {:position [3 -6 1], :velocity [3 2 -3]})))
+  (is (= 18 (d/energy {:position [2 0 4], :velocity [1 -1 -1]}))))
+
+(deftest part1-result
+  (is (= 12773 (d/part1))))
