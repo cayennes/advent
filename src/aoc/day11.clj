@@ -3,18 +3,22 @@
             [clojure.string :as string]
             [clojure.java.io :as io]))
 
+;;        [0 -1]
+;; [-1 0] [0  0] [1 0]
+;;        [0  1]
+
 (defn rotate
   [[x y] rotation-code]
   (case rotation-code
-    0 [y (- x)]
-    1 [(- y) x]))
+    0 [y (- x)] ;; left
+    1 [(- y) x])) ;; right
 
 (defn move-robot
   [robot rotation-code]
   (let [new-orientation (rotate (:orientation robot) rotation-code)]
     (-> robot
         (assoc :orientation new-orientation)
-        (update :position #(map + % new-orientation)))))
+        (update :position #(map + new-orientation %)))))
 
 (defn last-two
   [s]
@@ -22,18 +26,18 @@
 
 (defn do-stuff
   [{:keys [robot hull computer]}]
-  (let [current-color (first (get hull (:position robot) [0]))
+  (let [current-color (get hull (:position robot) 0)
         next-computer (-> computer (ic/add-input current-color) (ic/exec-all))
         [paint-color rotation-code] (-> next-computer :output last-two)]
     {:computer next-computer
-     :hull (update hull (:position robot) conj paint-color)
+     :hull (assoc hull (:position robot) paint-color)
      :robot (move-robot robot rotation-code)}))
 
 (defn do-everything
   [program initial-hull]
   (->> {:hull initial-hull
         :robot {:position [0 0]
-                :orientation [-1 0]}
+                :orientation [0 -1]}
         :computer (ic/new-computer program)}
        (iterate do-stuff)
        (drop-while #(not (get-in % [:computer :halt])))
@@ -50,19 +54,19 @@
   [hull]
   (string/join
    "\n"
-   (for [x (range (apply min (map first (keys hull)))
-                  (inc (apply max (map first (keys hull)))))]
-     (apply str (for [y (range (apply min (map second (keys hull)))
-                               (inc (apply max (map second (keys hull)))))]
-                  (case (first (get hull [x y] [0]))
-                    0 "."
-                    1 "#"))))))
+   (for [y (range (apply min (map second (keys hull)))
+                  (inc (apply max (map second (keys hull)))))]
+     (apply str
+            (for [x (range (apply min (map first (keys hull)))
+                           (inc (apply max (map first (keys hull)))))]
+              (case (get hull [x y] 0)
+                0 "."
+                1 "#"))))))
 
 (defn day11-2
   []
   (-> (io/resource "day11") (slurp) (ic/parse)
-      (do-everything {[0 0] '(1)})
+      (do-everything {[0 0] 1})
       (:hull)
       (show-hull)
       (println)))
-;; turns out my robot is doing everything backwards. good enough.
