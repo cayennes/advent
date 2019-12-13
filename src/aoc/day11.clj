@@ -50,7 +50,7 @@
       (:hull)
       (count)))
 
-;; TODO: factor into util
+;; TODO: use util/show-location-map
 (defn show-hull
   [hull]
   (string/join
