@@ -1,15 +1,16 @@
 (ns aoc.day12
   (:require [aoc.util :as util]
             [clojure.java.io :as io]
-            [clojure.edn :as edn]))
+            [clojure.edn :as edn]
+            [clojure.math.numeric-tower :as nt]))
 
 (defn parse
   [input]
   (->> input
        (re-seq #"x=([-0-9]*).*?y=([-0-9]*).*?z=([-0-9]*)")
-       (map rest)
-       (map #(mapv edn/read-string %))
-       (map (fn [p] {:position p :velocity [0 0 0]}))))
+       (mapv rest)
+       (mapv #(mapv edn/read-string %))
+       (mapv (fn [p] {:position p :velocity [0 0 0]}))))
 
 (defn sign
   [number]
@@ -35,8 +36,8 @@
 
 (defn step
   [objects]
-  (map #(-> % (update-velocity objects) (update-position))
-       objects))
+  (mapv #(-> % (update-velocity objects) (update-position))
+        objects))
 
 (defn all-steps
   [objects]
@@ -58,24 +59,33 @@
       (->> (map energy)
            (apply +))))
 
-(defn extract-coord
-  [object coord]
-  (mapv #(get % coord) (vals object)))
+(defn minimum-loop-length
+  [s]
+  (loop [[x & more] s
+         seen {}
+         n 0]
+    (cond
+      (seen x) (- n (seen x))
+      (empty? more) nil
+      :else (recur more
+                   (assoc seen x n)
+                   (inc n)))))
 
-(defn loop-size-by-coordinate
-  [object-seq]
-  (loop [[object & more] object-seq
-         seen [#{} #{} #{}]
-         n 0
-         loop-sizes [nil nil nil]]
-    (if (every? some? loop-sizes)
-      loop-sizes
-      (let [seen? (-> (->> (range 3)
-                           (filter #(nil? (loop-sizes %)))
-                           (map #(vector % (extract-coord object %))))
-                      (as-> [coord state] ((seen coord) state)))]
-        (recur more
-               (mapv #(update conj %1 (extract-coord %2)) seen (range 3))
-               (inc n)
-               (mapv #(if (or %1 (if (seen? %2) n)) loop-sizes (range))))))))
+(defn extract-object-coord
+  [objects object-index axis-index]
+  (mapv #(get % axis-index) (vals (get objects object-index))))
 
+(defn total-loop-length
+  [step-seq]
+  (reduce nt/lcm
+          (for [object-index (range (count (first step-seq)))
+                axis-index (range 3)]
+            (minimum-loop-length
+             (map #(extract-object-coord % object-index axis-index)
+                  step-seq)))))
+
+(defn part2
+  []
+  (-> (io/resource "day12") (slurp) (parse)
+      (all-steps)
+      (total-loop-length)))
