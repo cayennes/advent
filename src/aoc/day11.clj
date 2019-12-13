@@ -50,6 +50,7 @@
       (:hull)
       (count)))
 
+;; TODO: factor into util
 (defn show-hull
   [hull]
   (string/join
