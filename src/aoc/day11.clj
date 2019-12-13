@@ -1,6 +1,6 @@
 (ns aoc.day11
   (:require [aoc.intcode-computer :as ic]
-            [clojure.string :as string]
+            [aoc.util :as util]
             [clojure.java.io :as io]))
 
 ;;        [0 -1]
@@ -50,24 +50,10 @@
       (:hull)
       (count)))
 
-;; TODO: use util/show-location-map
-(defn show-hull
-  [hull]
-  (string/join
-   "\n"
-   (for [y (range (apply min (map second (keys hull)))
-                  (inc (apply max (map second (keys hull)))))]
-     (apply str
-            (for [x (range (apply min (map first (keys hull)))
-                           (inc (apply max (map first (keys hull)))))]
-              (case (get hull [x y] 0)
-                0 "."
-                1 "#"))))))
-
 (defn day11-2
   []
   (-> (io/resource "day11") (slurp) (ic/parse)
       (do-everything {[0 0] 1})
       (:hull)
-      (show-hull)
+      (util/show-location-map {0 "." 1 "#"})
       (println)))

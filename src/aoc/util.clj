@@ -17,6 +17,6 @@
    (for [y (range (apply min (map second (keys locations)))
                   (inc (apply max (map second (keys locations)))))]
      (apply str
-            (for [x (range (apply min (map first (keys hull)))
-                           (inc (apply max (map first (keys hull)))))]
-              (display-chars (get hull [x y] 0)))))))
+            (for [x (range (apply min (map first (keys locations)))
+                           (inc (apply max (map first (keys locations)))))]
+              (display-chars (locations [x y] 0) "?"))))))

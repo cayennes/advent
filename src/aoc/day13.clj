@@ -18,9 +18,37 @@
       (:output)
       (count-blocks)))
 
-;; made this before realizing that's not what it's asking
-(defn display
-  [s]
-  (reduce (fn [screen [x y thing]] (assoc screen [x y] thing))
-          (partition 3 s)))
+(defn pop-score
+  [screen]
+  [(screen [-1 0]) (dissoc screen [-1 0])])
 
+(defn update-screen
+  [screen new]
+  (reduce (fn [screen [x y thing]]
+            (assoc screen [x y] thing))
+          screen
+          (partition 3 new)))
+
+(defn display
+  [screen]
+  (let [[score game] (pop-score screen)]
+    (println "score:" score)
+    (println (util/show-location-map game {0 " " 1 "@" 2 "#" 3 "-" 4 "o"}))))
+
+(defn get-human-input
+  [screen]
+  (display screen)
+  (case (first (read-line))
+    \d -1
+    \f 1
+    0))
+
+(defn part2
+  []
+  (-> (util/read-input "day13" ic/parse)
+      (assoc 1 2)
+      (ic/new-computer)
+      (ic/exec-all)
+      (:output)
+      (->> (update-screen {}))
+      (get-human-input)))
