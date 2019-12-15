@@ -20,3 +20,19 @@
             (for [x (range (apply min (map first (keys locations)))
                            (inc (apply max (map first (keys locations)))))]
               (display-chars (locations [x y] 0) "?"))))))
+
+(defn distinct-by
+  [f s]
+  (vals (zipmap (map f s) s)))
+
+(defn iterate-until
+  [f pred x]
+  (->> (iterate f x)
+       (drop-while #(not (pred %)))
+       (first)))
+
+(defn counting-iterate-until
+  [f pred x]
+  (->> (iterate (fn [[y i]] [(f y) (inc i)]) [x 0])
+       (drop-while (fn [[y _]] (not (pred y))))
+       (first)))
