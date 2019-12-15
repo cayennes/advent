@@ -263,6 +263,7 @@
       (:output)
       (last)))
 
-;; TODO: generalize from day11
-(defn run-in-world
-  [{:keys [computer] :as world} world-update-fn])
+(defn slurp-output
+  [computer]
+  (let [output (:output computer)]
+    [output (assoc computer :output [])]))

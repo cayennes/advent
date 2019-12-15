@@ -20,15 +20,15 @@
         (assoc :orientation new-orientation)
         (update :position #(map + new-orientation %)))))
 
-(defn last-two
-  [s]
-  (->> s reverse (take 2) reverse))
-
 (defn do-stuff
   [{:keys [robot hull computer]}]
   (let [current-color (get hull (:position robot) 0)
-        next-computer (-> computer (ic/add-input current-color) (ic/exec-all))
-        [paint-color rotation-code] (-> next-computer :output last-two)]
+
+        [[paint-color rotation-code] next-computer]
+        (-> computer
+            (ic/add-input current-color)
+            (ic/exec-all)
+            (ic/slurp-output))]
     {:computer next-computer
      :hull (assoc hull (:position robot) paint-color)
      :robot (move-robot robot rotation-code)}))
