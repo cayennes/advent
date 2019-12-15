@@ -42,14 +42,12 @@
   (is (= 3 (d/minimum-loop-length [4 9 2 4 6]))
       (= 2 (d/minimum-loop-length [5 4 0 2 0 2]))))
 
-(deftest extract-object-coord-works
-  (is (= [-7 1]
-         (d/extract-object-coord [{:position [2 -1 1] :velocity [3 -1 -1]}
-                                  {:position [3 -7 -4] :velocity [1 3 3]}
-                                  {:position [1 -7 5] :velocity [-3 1 -3]}
-                                  {:position [2 2 0] :velocity [-1 -3 1]}]
-                                 2
-                                 1))))
+(deftest extract-coord-works
+  (d/extract-coord [{:position [2 -1 1] :velocity [3 -1 -1]}
+                    {:position [3 -7 -4] :velocity [1 3 3]}
+                    {:position [1 -7 5] :velocity [-3 1 -3]}
+                    {:position [2 2 0] :velocity [-1 -3 1]}]
+                   2))
 
 (deftest total-loop-length-works
   (is (= 2772
@@ -59,3 +57,6 @@
               {:position [3 5 -1], :velocity [0 0 0]}]
              (d/all-steps)
              (d/total-loop-length)))))
+
+(deftest part2-result
+  (is (= 306798770391636 (part2))))

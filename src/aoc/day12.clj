@@ -71,17 +71,18 @@
                    (assoc seen x n)
                    (inc n)))))
 
-(defn extract-object-coord
-  [objects object-index axis-index]
-  (mapv #(get % axis-index) (vals (get objects object-index))))
+(defn extract-coord
+  [objects axis-index]
+  (vals objects)
+  (mapv (fn [o] (mapv #(get % axis-index) (vals o)))
+        objects))
 
 (defn total-loop-length
   [step-seq]
   (reduce nt/lcm
-          (for [object-index (range (count (first step-seq)))
-                axis-index (range 3)]
+          (for [axis-index (range 3)]
             (minimum-loop-length
-             (map #(extract-object-coord % object-index axis-index)
+             (map #(extract-coord % axis-index)
                   step-seq)))))
 
 (defn part2
