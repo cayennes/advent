@@ -155,3 +155,28 @@
 ;; [:right 10]
 ;; [:right 10]
 ;; [:left 4]
+
+(defn unspace
+  "remove all spaces"
+  [s]
+  (string/replace s #" " ""))
+
+(defn robot-input
+  []
+  (map int
+       (unspace "A,B,A,C,A,B,C,B,C,B
+                 R,10,R,10,R,6,R,4
+                 R,10,R,10,L,4
+                 R,4,L,4,L,10,L,10
+                 n
+                 ")))
+
+(defn part2
+  []
+  (-> (util/read-input "day17" ic/parse)
+      (ic/new-computer (robot-input))
+      (assoc-in [:program 0] 2)
+      (ic/exec-all)
+      (:output)
+      (last)))
+

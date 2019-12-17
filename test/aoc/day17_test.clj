@@ -54,3 +54,11 @@
          (d/all-segments {[0 0] "#" [1 0] "#" [1 1] "." [3 0] "#" [4 1] "#"
                           [0 2] ">" [2 0] "#" [3 1] "#" [2 1] "." [0 1] "#"}
                          {:position [0 2] :orientation [1 0]}))))
+
+(deftest unspace-works
+  (is (= "ABC\nDEF"
+         (d/unspace "ABC
+                     DEF"))))
+
+(deftest part2-result
+  (is (= 578918 (d/part2))))
