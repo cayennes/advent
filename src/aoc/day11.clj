@@ -3,16 +3,11 @@
             [aoc.util :as util]
             [clojure.java.io :as io]))
 
-(defn rotate
-  [direction rotation-code]
-  (util/rotate direction (case rotation-code 0 :left 1 :right)))
-
 (defn move-robot
   [robot rotation-code]
-  (let [new-orientation (rotate (:orientation robot) rotation-code)]
-    (-> robot
-        (assoc :orientation new-orientation)
-        (update :position #(map + new-orientation %)))))
+  (-> robot
+      (util/turn (case rotation-code 0 :left 1 :right))
+      (util/move-forward 1)))
 
 (defn do-stuff
   [{:keys [robot hull computer]}]

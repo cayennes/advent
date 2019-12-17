@@ -43,28 +43,96 @@
         (string->position-map)
         (intersections-checksum))))
 
+;; these functions work with virtual robots that we can just tell us to move
+
 (defn available-turn
-  [scaffold-map {:keys [position direction]}]
+  [scaffold-map {:keys [position orientation]}]
   (->> [:left :right]
        (filter #(= "#"
-                   (scaffold-map (mapv + position (util/rotate direction %)))))
+                   (scaffold-map (mapv + position (util/rotate orientation %)))))
        (first)))
 
 (defn count-scaffolding-ahead
-  [scaffold-map {:keys [position direction]}]
-  (->> (iterate #(mapv + % direction) position)
+  [scaffold-map {:keys [position orientation]}]
+  (->> (iterate #(mapv + % orientation) position)
        (rest) ;; drop current position
        (map scaffold-map)
        (take-while #(= "#" %))
        (count)))
 
 (defn next-path-segment
-  [scaffold-map {:keys [position direction] :as robot}]
-  (let [turn (available-turn scaffold-map robot)
-        length (count-scaffolding-ahead
-                scaffold-map
-                (update robot :direction util/rotate turn))]
-    [turn length]))
+  [scaffold-map robot]
+  (if-let [turn (available-turn scaffold-map robot)]
+    (let [length (count-scaffolding-ahead
+                  scaffold-map
+                  (update robot :orientation util/rotate turn))]
+      [turn length])))
 
-;; TODO: make the above function more iterable and/or make a function for a
-;; robot to travel a path
+(defn follow-path
+  "move the robot along the path, with no length restriction"
+  [robot path]
+  (reduce (fn [r [side length]]
+            (-> r
+                (util/turn side)
+                (util/move-forward length)))
+          robot
+          path))
+
+(defn all-segments
+  [scaffold-map robot]
+  (loop [path []]
+    (if-let [next-segment (next-path-segment scaffold-map
+                                             (follow-path robot path))]
+      (recur (conj path next-segment))
+      path)))
+
+(defn calculate-map
+  []
+  (-> (util/read-input "day17" ic/parse)
+      (ic/new-computer)
+      (ic/exec-all)
+      (:output)
+      (ascii)
+      (string->position-map)))
+
+(defn complete-path
+  []
+  (all-segments (calculate-map)
+                {:position [3 12] :orientation [0 -1]}))
+
+;; [[:right 9]
+;;  [:right 10]
+;;  [:right 6]
+;;  [:right 4]
+;;  [:right 10]
+;;  [:right 10]
+;;  [:left 4]
+;;  [:right 10]
+;;  [:right 10]
+;;  [:right 6]
+;;  [:right 4]
+;;  [:right 4]
+;;  [:left 4]
+;;  [:left 10]
+;;  [:left 10]
+;;  [:right 10]
+;;  [:right 10]
+;;  [:right 6]
+;;  [:right 4]
+;;  [:right 10]
+;;  [:right 10]
+;;  [:left 4]
+;;  [:right 4]
+;;  [:left 4]
+;;  [:left 10]
+;;  [:left 10]
+;;  [:right 10]
+;;  [:right 10]
+;;  [:left 4]
+;;  [:right 4]
+;;  [:left 4]
+;;  [:left 10]
+;;  [:left 10]
+;;  [:right 10]
+;;  [:right 10]
+;;  [:left 4]]

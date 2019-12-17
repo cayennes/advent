@@ -45,12 +45,22 @@
   [position]
   (mapv #(mapv + % position) [[0 -1] [0 1] [-1 0] [1 0]]))
 
+;; robot moving
+
 ;;        [0 -1]
 ;; [-1 0] [0  0] [1 0]
 ;;        [0  1]
 
-(defn rotate
+(defn rotate-coord
   [[x y] side]
   (case side
     :left [y (- x)]
     :right [(- y) x]))
+
+(defn turn
+  [robot side]
+  (update robot :orientation rotate-coord side))
+
+(defn move-forward
+  [{:keys [orientation] :as robot} n]
+  (update robot :position #(mapv + % (mapv * orientation [n n]))))
