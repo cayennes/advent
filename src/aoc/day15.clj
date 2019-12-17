@@ -77,15 +77,11 @@
        (util/iterate-until explore-step :fully-explored)
        (:map)))
 
-(defn adjacent-positions
-  [position]
-  (map #(mapv + % position) (vals moves)))
-
 (defn fill-step
   [room-map]
   (into room-map
         (for [[position contents] room-map
-              adjacent-position (adjacent-positions position)
+              adjacent-position (util/adjacent-positions position)
               :when (and (= :oxygen contents)
                          (= :empty (room-map adjacent-position)))]
           [adjacent-position :oxygen])))

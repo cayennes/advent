@@ -40,3 +40,7 @@
 (defn digits->number
   [digits]
   (reduce #(+ (* 10 %1) %2) digits))
+
+(defn adjacent-positions
+  [position]
+  (mapv #(mapv + % position) [[0 -1] [0 1] [-1 0] [1 0]]))

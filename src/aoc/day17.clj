@@ -8,23 +8,38 @@
   (apply str (map char int-seq)))
 
 (defn string->position-map
-  [s]
-  (map-indexed
-   (fn [i row]
-     (map-indexed
-      (fn [j col] :TODO) row)
-     (string/split #"\n"))))
+  [diagram-string]
+  (into {}
+        (for [[y row] (map-indexed vector (string/split diagram-string #"\n"))
+              [x ch] (map-indexed vector row)]
+          [[x y] (str ch)])))
 
+(defn intersection?
+  [scaffold-map pos]
+  (every? #(= (scaffold-map %) "#")
+          (conj (util/adjacent-positions pos) pos)))
+
+(defn all-intersections
+  [scaffold-map]
+  (filter #(intersection? scaffold-map (first %)) scaffold-map))
+
+(defn intersections-checksum
+  [scaffold-map]
+  (->> scaffold-map
+       (all-intersections)
+       (map first)
+       (map #(apply * %))
+       (apply +)))
+
+;; TODO: add test that this is 4112
 (defn part1
   []
-  (-> (util/read-input "day17" ic/parse)
-      (ic/new-computer)
-      (ic/exec-all)
-      (:output)))
-
-(comment (-> (util/read-input "day17" ic/parse)
-             (ic/new-computer)
-             (ic/exec-all)
-             (:output)
-             (ascii)
-             (println)))
+  (let [output-str (-> (util/read-input "day17" ic/parse)
+                       (ic/new-computer)
+                       (ic/exec-all)
+                       (:output)
+                       (ascii))]
+    (println output-str)
+    (-> output-str
+        (string->position-map)
+        (intersections-checksum))))
