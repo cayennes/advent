@@ -98,41 +98,60 @@
 (defn complete-path
   []
   (all-segments (calculate-map)
-                {:position [3 12] :orientation [0 -1]}))
+                {:position [2 12] :orientation [0 -1]}))
 
-;; [[:right 9]
-;;  [:right 10]
-;;  [:right 6]
-;;  [:right 4]
-;;  [:right 10]
-;;  [:right 10]
-;;  [:left 4]
-;;  [:right 10]
-;;  [:right 10]
-;;  [:right 6]
-;;  [:right 4]
-;;  [:right 4]
-;;  [:left 4]
-;;  [:left 10]
-;;  [:left 10]
-;;  [:right 10]
-;;  [:right 10]
-;;  [:right 6]
-;;  [:right 4]
-;;  [:right 10]
-;;  [:right 10]
-;;  [:left 4]
-;;  [:right 4]
-;;  [:left 4]
-;;  [:left 10]
-;;  [:left 10]
-;;  [:right 10]
-;;  [:right 10]
-;;  [:left 4]
-;;  [:right 4]
-;;  [:left 4]
-;;  [:left 10]
-;;  [:left 10]
-;;  [:right 10]
-;;  [:right 10]
-;;  [:left 4]]
+;; A
+;; [:right 10]
+;; [:right 10]
+;; [:right 6]
+;; [:right 4]
+
+;; B
+;; [:right 10]
+;; [:right 10]
+;; [:left 4]
+
+;; A
+;; [:right 10]
+;; [:right 10]
+;; [:right 6]
+;; [:right 4]
+
+;; C
+;; [:right 4]
+;; [:left 4]
+;; [:left 10]
+;; [:left 10]
+
+;; A
+;; [:right 10]
+;; [:right 10]
+;; [:right 6]
+;; [:right 4]
+
+;; B
+;; [:right 10]
+;; [:right 10]
+;; [:left 4]
+
+;; C
+;; [:right 4]
+;; [:left 4]
+;; [:left 10]
+;; [:left 10]
+
+;; B
+;; [:right 10]
+;; [:right 10]
+;; [:left 4]
+
+;; C
+;; [:right 4]
+;; [:left 4]
+;; [:left 10]
+;; [:left 10]
+
+;; B
+;; [:right 10]
+;; [:right 10]
+;; [:left 4]
