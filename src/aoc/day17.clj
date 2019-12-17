@@ -31,7 +31,6 @@
        (map #(apply * %))
        (apply +)))
 
-;; TODO: add test that this is 4112
 (defn part1
   []
   (let [output-str (-> (util/read-input "day17" ic/parse)
@@ -43,3 +42,29 @@
     (-> output-str
         (string->position-map)
         (intersections-checksum))))
+
+(defn available-turn
+  [scaffold-map {:keys [position direction]}]
+  (->> [:left :right]
+       (filter #(= "#"
+                   (scaffold-map (mapv + position (util/rotate direction %)))))
+       (first)))
+
+(defn count-scaffolding-ahead
+  [scaffold-map {:keys [position direction]}]
+  (->> (iterate #(mapv + % direction) position)
+       (rest) ;; drop current position
+       (map scaffold-map)
+       (take-while #(= "#" %))
+       (count)))
+
+(defn next-path-segment
+  [scaffold-map {:keys [position direction] :as robot}]
+  (let [turn (available-turn scaffold-map robot)
+        length (count-scaffolding-ahead
+                scaffold-map
+                (update robot :direction util/rotate turn))]
+    [turn length]))
+
+;; TODO: make the above function more iterable and/or make a function for a
+;; robot to travel a path

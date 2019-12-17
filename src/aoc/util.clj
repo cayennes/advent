@@ -44,3 +44,13 @@
 (defn adjacent-positions
   [position]
   (mapv #(mapv + % position) [[0 -1] [0 1] [-1 0] [1 0]]))
+
+;;        [0 -1]
+;; [-1 0] [0  0] [1 0]
+;;        [0  1]
+
+(defn rotate
+  [[x y] side]
+  (case side
+    :left [y (- x)]
+    :right [(- y) x]))

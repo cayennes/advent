@@ -3,15 +3,9 @@
             [aoc.util :as util]
             [clojure.java.io :as io]))
 
-;;        [0 -1]
-;; [-1 0] [0  0] [1 0]
-;;        [0  1]
-
 (defn rotate
-  [[x y] rotation-code]
-  (case rotation-code
-    0 [y (- x)] ;; left
-    1 [(- y) x])) ;; right
+  [direction rotation-code]
+  (util/rotate direction (case rotation-code 0 :left 1 :right)))
 
 (defn move-robot
   [robot rotation-code]
