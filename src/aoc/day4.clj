@@ -1,10 +1,6 @@
 (ns aoc.day4
-  (:require [clojure.test :refer [is]]))
-
-(defn digits->number
-  {:test #(is (= 17 (digits->number [1 7])))}
-  [digits]
-  (reduce #(+ (* 10 %1) %2) digits))
+  (:require [aoc.util :as util]
+            [clojure.test :refer [is]]))
 
 (defn double-item-at
   {:test #(do (is (= [0 0 1 2 3 4] (double-item-at (range 5) 0)))
@@ -24,7 +20,9 @@
          d (range c 10)
          e (range d 10)
          double-idx (range 5)
-         :let [code (-> [a b c d e] (double-item-at double-idx) (digits->number))]
+         :let [code (-> [a b c d e]
+                        (double-item-at double-idx)
+                        (util/digits->number))]
          :when (<= start code)
          :while (<= code end)]
      code)))
@@ -45,7 +43,7 @@
          e (range d 10)
          double-idx (range 5)
          :let [code (double-item-at [a b c d e] double-idx)
-               code-number (digits->number code)]
+               code-number (util/digits->number code)]
          :when (and (<= start code-number)
                     (distinct? (get code double-idx)
                                (get code (dec double-idx))

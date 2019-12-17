@@ -36,3 +36,7 @@
   (->> (iterate (fn [[y i]] [(f y) (inc i)]) [x 0])
        (drop-while (fn [[y _]] (not (pred y))))
        (first)))
+
+(defn digits->number
+  [digits]
+  (reduce #(+ (* 10 %1) %2) digits))
