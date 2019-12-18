@@ -7,3 +7,16 @@
 
 (deftest digits->number-works
   (is (= 17 (util/digits->number [1 7]))))
+
+
+(deftest string->position-map-works
+  (is (= {[0 0] "#", [1 0] ".", [0 1] "#", [1 1] "#"}
+         (-> "#.
+              ##"
+             util/despace
+             util/string->position-map)))
+  (is (= {[0 0] "#", [1 0] ".", [0 1] "#", [1 1] "#"}
+         (-> "#.
+              ##"
+             util/despace
+             util/string->position-map))))

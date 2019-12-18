@@ -7,13 +7,6 @@
   [int-seq]
   (apply str (map char int-seq)))
 
-(defn string->position-map
-  [diagram-string]
-  (into {}
-        (for [[y row] (map-indexed vector (string/split diagram-string #"\n"))
-              [x ch] (map-indexed vector row)]
-          [[x y] (str ch)])))
-
 (defn intersection?
   [scaffold-map pos]
   (every? #(= (scaffold-map %) "#")
@@ -40,7 +33,7 @@
                        (ascii))]
     (println output-str)
     (-> output-str
-        (string->position-map)
+        (util/string->position-map)
         (intersections-checksum))))
 
 ;; these functions work with virtual robots that we can just tell us to move
@@ -93,7 +86,7 @@
       (ic/exec-all)
       (:output)
       (ascii)
-      (string->position-map)))
+      (util/string->position-map)))
 
 (defn complete-path
   []
@@ -179,4 +172,3 @@
       (ic/exec-all)
       (:output)
       (last)))
-

@@ -45,7 +45,18 @@
   [position]
   (mapv #(mapv + % position) [[0 -1] [0 1] [-1 0] [1 0]]))
 
-;; robot moving
+(defn string->position-map
+  [diagram-string]
+  (into {}
+        (for [[y row] (map-indexed vector (string/split diagram-string #"\n"))
+              [x ch] (map-indexed vector row)]
+          [[x y] (str ch)])))
+
+(defn despace
+  [s]
+  (string/replace s " " ""))
+
+;; robot etc. moving
 
 ;;        [0 -1]
 ;; [-1 0] [0  0] [1 0]
