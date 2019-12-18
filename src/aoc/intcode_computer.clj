@@ -267,3 +267,7 @@
   [computer]
   (let [output (:output computer)]
     [output (assoc computer :output [])]))
+
+(defn add-inputs
+  [computer inputs]
+  (update computer :input concat inputs))

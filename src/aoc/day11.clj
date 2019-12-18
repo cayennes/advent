@@ -9,18 +9,24 @@
       (util/turn (case rotation-code 0 :left 1 :right))
       (util/move-forward 1)))
 
+(defn make-color-input
+  [{:keys [robot hull]}]
+  [(get hull (:position robot) 0)])
+
+(defn instruct-robot
+  [{:keys [robot hull]} [paint-color rotation-code]]
+  {:hull (assoc hull (:position robot) paint-color)
+   :robot (move-robot robot rotation-code)})
+
 (defn do-stuff
   [{:keys [robot hull computer]}]
-  (let [current-color (get hull (:position robot) 0)
-
-        [[paint-color rotation-code] next-computer]
-        (-> computer
-            (ic/add-input current-color)
-            (ic/exec-all)
-            (ic/slurp-output))]
-    {:computer next-computer
-     :hull (assoc hull (:position robot) paint-color)
-     :robot (move-robot robot rotation-code)}))
+  (let [inputs (make-color-input {:robot robot :hull hull})
+        [instructions next-computer] (-> computer
+                                         (ic/add-inputs inputs)
+                                         (ic/exec-all)
+                                         (ic/slurp-output))]
+    (assoc (instruct-robot {:robot robot :hull hull} instructions)
+           :computer next-computer)))
 
 (defn do-everything
   [program initial-hull]
@@ -32,17 +38,18 @@
        (drop-while #(not (get-in % [:computer :halt])))
        (first)))
 
-(defn day11-1
+(defn part1
   []
   (-> (io/resource "day11") (slurp) (ic/parse)
       (do-everything {})
       (:hull)
       (count)))
 
-(defn day11-2
+(defn part2
   []
-  (-> (io/resource "day11") (slurp) (ic/parse)
-      (do-everything {[0 0] 1})
-      (:hull)
-      (util/show-location-map {0 "." 1 "#"})
-      (println)))
+  (let [result (-> (io/resource "day11") (slurp) (ic/parse)
+                   (do-everything {[0 0] 1})
+                   (:hull)
+                   (util/show-location-map {0 "." 1 "#"}))]
+    (println result)
+    result))
