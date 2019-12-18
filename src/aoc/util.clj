@@ -32,8 +32,8 @@
        (first)))
 
 (defn counting-iterate-until
-  [f pred x]
-  (->> (iterate (fn [[y i]] [(f y) (inc i)]) [x 0])
+  [iter-fn pred x]
+  (->> (iterate (fn [[y i]] [(iter-fn y) (inc i)]) [x 0])
        (drop-while (fn [[y _]] (not (pred y))))
        (first)))
 
