@@ -46,11 +46,14 @@
   (mapv #(mapv + % position) [[0 -1] [0 1] [-1 0] [1 0]]))
 
 (defn string->position-map
-  [diagram-string]
-  (into {}
-        (for [[y row] (map-indexed vector (string/split diagram-string #"\n"))
-              [x ch] (map-indexed vector row)]
-          [[x y] (str ch)])))
+  ([diagram-string]
+   (string->position-map diagram-string nil))
+  ([diagram-string filler-char]
+   (into {}
+         (for [[y row] (map-indexed vector (string/split diagram-string #"\n"))
+               [x ch] (map-indexed vector row)
+               :when (not= filler-char ch)]
+           [[x y] (str ch)]))))
 
 (defn despace
   [s]
