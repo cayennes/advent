@@ -161,3 +161,6 @@
 
 (comment "slow"
   (= 45710 (ic/day9-2)))
+
+(deftest add-inputs-works
+  (is (= {:input [1 2 4]} (ic/add-inputs {:input [1]} [2 4]))))
