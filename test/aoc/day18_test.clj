@@ -15,12 +15,16 @@
   (is (= {:position [5 1] :keyring #{}}
          (d/initial-searcher ex1))))
 
-(deftest expand-searcher-works
+(deftest step-searchers-works
   (is (= #{{:position [4 1] :keyring #{}} {:position [6 1] :keyring #{}}}
          (-> {:searchers [{:position [5 1] :keyring #{}}] :area ex1}
              (d/step-searchers)
              (:searchers)
              (set)))))
+
+(deftest done-fn-works
+  (is (= true
+         ((d/done-fn ex1) {:searchers [{:keyring #{"a" "b"}}]}))))
 
 (deftest part1-examples
   (is (= 8
@@ -29,4 +33,4 @@
               #########"
              util/despace
              util/string->position-map
-             #_d/min-steps))))
+             d/min-steps))))
