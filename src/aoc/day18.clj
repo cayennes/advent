@@ -56,9 +56,23 @@
            {:searchers [(initial-searcher area)]
             :area area})))
 
-;; this is too slow and eventually runs out of memory. a better approach would
-;; involve building a tree from the center and using an algorithm similar to the
-;; orbits.
+;; this is too slow and eventually runs out of memory. a better approach:
+
+;; first, use searchers from the center never backtrack and store their whole
+;; path. collect them as they get stuck in different corners, and keep the one
+;; that got there the quickest (some will loop around the center first) and
+;; store their whole path. collect them as they get stuck in different corners,
+;; and keep the one that got there the quickest (some will loop around the
+;; center first)
+
+;; use that to create a list of all possible orders to pick up keys, given door
+;; locations
+
+;; also use it to (once each) calculate the length between each pair of keys
+;; (ignoing doors), using an algorithm like the orbits, with some special casing
+;; within one of the origin
+
+;; then go through them to the shortest path
 
 (defn part1
   []
