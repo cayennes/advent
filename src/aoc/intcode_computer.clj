@@ -1,5 +1,6 @@
 (ns aoc.intcode-computer
-  (:require [clojure.edn :as edn]
+  (:require [aoc.util :as util]
+            [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.string :as string]))
 
@@ -271,3 +272,21 @@
 (defn add-inputs
   [computer inputs]
   (update computer :input concat inputs))
+
+(defn world-step-fn
+  [update-world input]
+  (fn [{:keys [world computer]}]
+    (let [inputs (input world)
+          [instructions next-computer] (-> computer
+                                           (add-inputs inputs)
+                                           (exec-all)
+                                           (slurp-output))]
+      {:world (update-world world instructions)
+       :computer next-computer})))
+
+(defn run-in-world
+  [computer initial-world update-world-fn input-fn]
+  (util/iterate-until
+   (world-step-fn update-world-fn input-fn)
+   #(get-in % [:computer :halt])
+   {:computer computer :world initial-world}))
