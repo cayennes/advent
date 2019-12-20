@@ -33,30 +33,21 @@
   [screen]
   (let [[score game] (pop-score screen)]
     (println "score:" score)
-    (println (util/show-location-map game {0 " " 1 "@" 2 "#" 3 "-" 4 "o"}))))
+    (println (util/show-location-map game {0 " " 1 "@" 2 "#" 3 "=" 4 "o"}))))
 
 (defn get-human-input
   [screen]
   (display screen)
   (case (first (read-line))
-    \d -1
-    \f 1
-    0))
+    \d [-1]
+    \f [1]
+    [0]))
 
+;; for actual play, use console repl rather than inside emacs
 (defn play-game
   []
   (ic/run-in-world
-   (-> (util/read-input "day13" ic/parse) (assoc 1 2) (ic/new-computer))
-   {[0 0] "."}
+   (-> (util/read-input "day13" ic/parse) (assoc 0 2) (ic/new-computer))
+   {}
    update-screen
    get-human-input))
-
-(defn part2
-  []
-  (-> (util/read-input "day13" ic/parse)
-      (assoc 1 2)
-      (ic/new-computer)
-      (ic/exec-all)
-      (:output)
-      (->> (update-screen {}))
-      (get-human-input)))

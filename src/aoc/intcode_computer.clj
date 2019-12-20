@@ -277,17 +277,20 @@
   [update-world input]
   (fn [{:keys [world computer]}]
     (let [inputs (input world)
-          [instructions next-computer] (-> computer
-                                           (add-inputs inputs)
-                                           (exec-all)
-                                           (slurp-output))]
-      {:world (update-world world instructions)
+          [outputs next-computer] (-> computer
+                                      (add-inputs inputs)
+                                      (exec-all)
+                                      (slurp-output))]
+      {:world (update-world world outputs)
        :computer next-computer})))
 
-;; TODO: make this work in the case where we want the output before adding input
 (defn run-in-world
-  [computer initial-world update-world-fn input-fn]
+  [computer initial-world update-world input]
   (util/iterate-until
-   (world-step-fn update-world-fn input-fn)
+   (world-step-fn update-world input)
    #(get-in % [:computer :halt])
-   {:computer computer :world initial-world}))
+   (let [[initial-output running-computer] (-> computer
+                                               (exec-all)
+                                               (slurp-output))]
+     {:computer running-computer
+      :world (update-world initial-world initial-output)})))
