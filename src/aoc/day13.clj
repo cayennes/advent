@@ -43,6 +43,14 @@
     \f 1
     0))
 
+(defn play-game
+  []
+  (ic/run-in-world
+   (-> (util/read-input "day13" ic/parse) (assoc 1 2) (ic/new-computer))
+   {[0 0] "."}
+   update-screen
+   get-human-input))
+
 (defn part2
   []
   (-> (util/read-input "day13" ic/parse)

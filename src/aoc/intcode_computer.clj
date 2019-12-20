@@ -284,6 +284,7 @@
       {:world (update-world world instructions)
        :computer next-computer})))
 
+;; TODO: make this work in the case where we want the output before adding input
 (defn run-in-world
   [computer initial-world update-world-fn input-fn]
   (util/iterate-until
