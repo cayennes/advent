@@ -47,12 +47,12 @@
 
 (defn string->position-map
   ([diagram-string]
-   (string->position-map diagram-string nil))
-  ([diagram-string filler-char]
+   (string->position-map diagram-string #{}))
+  ([diagram-string filler-chars]
    (into {}
          (for [[y row] (map-indexed vector (string/split diagram-string #"\n"))
                [x ch] (map-indexed vector row)
-               :when (not= filler-char ch)]
+               :when (not (filler-chars ch))]
            [[x y] (str ch)]))))
 
 (defn despace
@@ -78,3 +78,7 @@
 (defn move-forward
   [{:keys [orientation] :as robot} n]
   (update robot :position #(mapv + % (mapv * orientation [n n]))))
+
+(defn vec+
+  [& vs]
+  (apply mapv + vs))

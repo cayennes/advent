@@ -20,3 +20,7 @@
               ##"
              util/despace
              util/string->position-map))))
+
+(deftest vec+-works
+  (is (= [110 12  13 13]
+         (util/vec+ [0 1 1 0] [10 11 12 13] [100 0 0 0]))))
