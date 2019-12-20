@@ -17,12 +17,33 @@
 (defn labeled-coords
   [raw-map]
   (for [[coord ch] raw-map
-        :let [label (maybe-label)]
+        :let [label (maybe-label raw-map coord)]
         :when (and label
-                   (not= "." ch))]
+                   (= "." ch))]
     [coord label]))
 
 ;; turn into a map of coord to adjacent coords
+
+(defn portal-adjacency-map
+  [raw-map]
+  (->> raw-map
+       (labeled-coords)
+       (group-by second)
+       (vals)
+       (mapcat (fn [[[c1 _] [c2 _]]]
+                 [[c1 #{c2}] [c2 #{c1}]]))
+       (into {})))
+
+(defn adjacency-map
+  [raw-map]
+  (->> raw-map
+       (filter #(= "." (val %)))))
+
+(defn adjacent-coord-map
+  [raw-map]
+  (merge-with set/union
+              (portal-adjacency-map raw-map)
+              (adjacency-map raw-map)))
 
 ;; search like in oxygen puzzle
 
