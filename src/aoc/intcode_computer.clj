@@ -286,11 +286,12 @@
 
 (defn run-in-world
   [computer initial-world update-world input]
-  (util/iterate-until
-   (world-step-fn update-world input)
-   #(get-in % [:computer :halt])
-   (let [[initial-output running-computer] (-> computer
-                                               (exec-all)
-                                               (slurp-output))]
-     {:computer running-computer
-      :world (update-world initial-world initial-output)})))
+  ((world-step-fn update-world (constantly []))
+   (util/iterate-until
+    (world-step-fn update-world input)
+    #(get-in % [:computer :halt])
+    (let [[initial-output running-computer] (-> computer
+                                                (exec-all)
+                                                (slurp-output))]
+      {:computer running-computer
+       :world (update-world initial-world initial-output)}))))

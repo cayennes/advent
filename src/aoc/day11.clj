@@ -14,9 +14,11 @@
   [(get hull (:position robot) 0)])
 
 (defn instruct-robot
-  [{:keys [robot hull]} [paint-color rotation-code]]
-  {:hull (assoc hull (:position robot) paint-color)
-   :robot (move-robot robot rotation-code)})
+  [{:keys [robot hull] :as world} input]
+  (if (not-empty input)
+    {:hull (assoc hull (:position robot) (first input))
+     :robot (move-robot robot (second input))}
+    world))
 
 (defn do-everything
   [program initial-hull]
