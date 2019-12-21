@@ -56,11 +56,15 @@
                                 (read-parameter computer 2 false))))
       (update :position #(+ 4 %))))
 
+(defn int-vec
+  [s]
+  (mapv int s))
+
 (defn new-computer
   ([program input]
    {:program program
     :position 0
-    :input (or input [])
+    :input (or (int-vec input) [])
     :output []
     :relative-base 0})
   ([program]
@@ -192,7 +196,7 @@
 
 (defn add-input
   [computer input]
-  (update computer :input concat [input]))
+  (update computer :input concat [(int input)]))
 
 (defn add-first-input
   [computers input]
@@ -271,7 +275,7 @@
 
 (defn add-inputs
   [computer inputs]
-  (update computer :input concat inputs))
+  (update computer :input concat (int-vec inputs)))
 
 (defn world-step-fn
   [update-world input]

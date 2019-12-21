@@ -82,3 +82,7 @@
 (defn vec+
   [& vs]
   (apply mapv + vs))
+
+(defn ascii
+  [int-seq]
+  (apply str (map char int-seq)))

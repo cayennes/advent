@@ -3,10 +3,6 @@
             [aoc.util :as util]
             [clojure.string :as string]))
 
-(defn ascii
-  [int-seq]
-  (apply str (map char int-seq)))
-
 (defn intersection?
   [scaffold-map pos]
   (every? #(= (scaffold-map %) "#")
@@ -30,7 +26,7 @@
                        (ic/new-computer)
                        (ic/exec-all)
                        (:output)
-                       (ascii))]
+                       (util/ascii))]
     (println output-str)
     (-> output-str
         (util/string->position-map)
@@ -85,7 +81,7 @@
       (ic/new-computer)
       (ic/exec-all)
       (:output)
-      (ascii)
+      (util/ascii)
       (util/string->position-map)))
 
 (defn complete-path
@@ -156,13 +152,12 @@
 
 (defn robot-input
   []
-  (map int
-       (unspace "A,B,A,C,A,B,C,B,C,B
+  (unspace "A,B,A,C,A,B,C,B,C,B
                  R,10,R,10,R,6,R,4
                  R,10,R,10,L,4
                  R,4,L,4,L,10,L,10
                  n
-                 ")))
+                 "))
 
 (defn part2
   []
