@@ -12,7 +12,7 @@
     (try
       (println (util/ascii result))
       (catch java.lang.IllegalArgumentException e
-        (println (util/ascii (butlast result)))
+        (println (util/ascii (pop result)))
         (last result)))))
 
 (comment
@@ -36,7 +36,6 @@
                    "NOT T T"
                    "WALK"))
 
-
 (defn part1
   []
   ;; jump visible holes when safe
@@ -49,3 +48,19 @@
                    "AND T J"
                    "WALK"))
 
+(defn part2
+  []
+  ;; (and (or (not a) (not b) (not c)) ;; there is a visible hole
+  ;;      d ;; it is safe to jump
+  ;;      (or e h)) ;; can walk or jump from there
+  (run-springdroid "OR A T"
+                   "AND B T"
+                   "AND C T"
+                   "NOT T T"
+                   "OR D J"
+                   "AND T J"
+                   ;; can either walk or jump from the landing spot
+                   "AND E T"
+                   "OR H T"
+                   "AND T J"
+                   "RUN"))
