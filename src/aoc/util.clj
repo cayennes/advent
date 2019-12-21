@@ -26,14 +26,14 @@
   (vals (zipmap (map f s) s)))
 
 (defn iterate-until
-  [f pred x]
-  (->> (iterate f x)
+  [iter pred init]
+  (->> (iterate iter init)
        (drop-while #(not (pred %)))
        (first)))
 
 (defn counting-iterate-until
-  [iter-fn pred x]
-  (->> (iterate (fn [[y i]] [(iter-fn y) (inc i)]) [x 0])
+  [iter pred init]
+  (->> (iterate (fn [[y i]] [(iter y) (inc i)]) [init 0])
        (drop-while (fn [[y _]] (not (pred y))))
        (first)))
 

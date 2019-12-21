@@ -1,5 +1,6 @@
 (ns aoc.day20
-  (:require [aoc.util :as util]))
+  (:require [aoc.util :as util]
+            [clojure.set :as set]))
 
 ;; for each dot, find any labels
 
@@ -28,6 +29,7 @@
   [raw-map]
   (->> raw-map
        (labeled-coords)
+       (filter #(not (#{:AA :ZZ} (second %))))
        (group-by second)
        (vals)
        (mapcat (fn [[[c1 _] [c2 _]]]
@@ -36,8 +38,13 @@
 
 (defn adjacency-map
   [raw-map]
-  (->> raw-map
-       (filter #(= "." (val %)))))
+  (apply
+   merge-with
+   set/union
+   (for [[coord ch] raw-map
+         adjacent-coord (util/adjacent-positions coord)
+         :when (= "." ch (raw-map adjacent-coord))]
+     {coord #{adjacent-coord}})))
 
 (defn adjacent-coord-map
   [raw-map]
@@ -47,6 +54,35 @@
 
 ;; search like in oxygen puzzle
 
+(defn find-label
+  [raw-map label]
+  (->> (labeled-coords raw-map)
+       (filter #(= label (second %)))
+       (first)
+       (first)))
+
+(defn search-step
+  [{:keys [adjacency-map search-locations visited] :as acc}]
+  (-> acc
+      (assoc :search-locations
+             (set (for [coord search-locations
+                        next-coord (adjacency-map coord)
+                        :when (not (visited next-coord))]
+                    next-coord)))
+      (update :visited #(set/union % search-locations))))
+
+(defn solve-steps
+  [raw-map]
+  (second (let [start (find-label raw-map :AA)
+                finish (find-label raw-map :ZZ)]
+            (util/counting-iterate-until
+             search-step
+             #((:search-locations %) finish)
+             {:adjacency-map (adjacent-coord-map raw-map)
+              :search-locations #{start}
+              :visited #{}}))))
+
 (defn part1
   []
-  (util/read-input "day20" #(util/string->position-map % #{\space \#})))
+  (solve-steps
+   (util/read-input "day20" #(util/string->position-map % #{\space \#}))))
