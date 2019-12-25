@@ -58,3 +58,7 @@
 (defn part1
   []
   (analyze (util/read-input "day24" parse)))
+
+(defn plutonianize
+  [bug-coords]
+  (set (map #(conj % 0) bug-coords)))
