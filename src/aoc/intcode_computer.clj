@@ -289,6 +289,12 @@
        :computer next-computer})))
 
 (defn run-in-world
+  "runs the computer until it halts
+
+  update-world should take the world state and the output of the computer and
+  return a new world state
+
+  input should take the world and return input for the next thing"
   [computer initial-world update-world input]
   ((world-step-fn update-world (constantly []))
    (util/iterate-until
