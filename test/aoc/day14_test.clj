@@ -27,6 +27,20 @@
 (deftest create-with-reaction-works
   (is (= {:needed {:A 2 :B 6} :spares {:A 3}}
          (d/create-with-reaction {:needed {:A 2} :spares {}}
-                                 [:A {:yield 3 :ingredients {:B 6}}]))))
+                                 :A
+                                 {:yield 3 :ingredients {:B 6}})))
+  (is (= {:needed {:A 10 :B 24} :spares {:A 12}}
+         (d/create-with-reaction {:needed {:A 10} :spares {}}
+                                 :A
+                                 {:yield 3 :ingredients {:B 6}}))))
+
 (deftest plan-all-works
-  (is (= 10 (d/plan-all {:FUEL {:yield 1 :ingredients {:ORE 10}}}))))
+  (is (= {:needed {:ORE 10} :spares {}}
+         (d/plan-all {:FUEL {:yield 1 :ingredients {:ORE 10}}}
+                     #{:ORE})))
+  (is (= {:needed {:A 1 :ORE 1} :spares {}}
+         (d/plan-all {:FUEL {:yield 1 :ingredients {:A 1 :ORE 1}}}
+                     #{:ORE :A}))))
+
+(deftest part1-result
+  (is (= 178154 (d/part1))))
