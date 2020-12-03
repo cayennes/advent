@@ -1,10 +1,10 @@
-(ns y2020.day01-test
-  (:require [y2020.day01 :as d]
+(ns y2020.day02-test
+  (:require [y2020.day02 :as d]
             [clojure.test :refer [deftest is]]))
 
 (deftest correct-results
-  (is (= 840324 (d/part1)))
-  (is (= 170098110 (d/part2))))
+  (is (= 500 (d/part1)))
+  (is (= 313 (d/part2))))
 
 (comment "run"
   (clojure.test/run-tests))
