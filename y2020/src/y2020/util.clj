@@ -1,5 +1,13 @@
 (ns y2020.util
-  (:require [clojure.java.io :as io]))
+  (:require [clojure.java.io :as io]
+            [clojure.string :as string]))
+
+(defn string-lines
+  "for use with test input"
+  [input-string line-parse-fn]
+  (->> (string/split input-string #"\n")
+       (mapv string/trim)
+       (mapv line-parse-fn)))
 
 (defn input-lines*
   ([filename line-parse-fn]
