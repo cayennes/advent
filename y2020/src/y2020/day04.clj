@@ -17,9 +17,7 @@
 
 (defn part1
   [input]
-  (->> input
-       (filter has-required-fields?)
-       (count)))
+  (util/count-satisfying input has-required-fields?))
 
 (defn has-valid-data?
   [{:strs [byr iyr eyr hgt hcl ecl pid] :as passport}]
@@ -49,9 +47,7 @@
 
 (defn part2
   [input]
-  (->> input
-       (filter has-valid-data?)
-       (count)))
+  (util/count-satisfying input has-valid-data?))
 
 (comment "run"
   (part1 (util/input "day04" parse))

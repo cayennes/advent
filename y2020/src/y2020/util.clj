@@ -27,3 +27,9 @@
 (defn trim-lines
   [s]
   (string/replace s #"^ +" ""))
+
+(defn count-satisfying
+  [s pred]
+  (->> s
+       (filter pred)
+       (count)))

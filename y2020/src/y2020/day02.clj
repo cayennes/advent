@@ -5,7 +5,7 @@
 
 (defn parse-line
   [s]
-  (let [[_ n1 n2 character password] (re-matches #"(\d+)-(\d+) (.): (.*)" line)]
+  (let [[_ n1 n2 character password] (re-matches #"(\d+)-(\d+) (.): (.*)" s)]
     {:n1 (Integer. n1)
      :n2 (Integer. n2)
      :character (first character)
@@ -19,15 +19,9 @@
           (count))
       n2))
 
-(defn count-valid-passwords
-  [f]
-  (->> (util/input-lines "day02" parse-line)
-       (filter f)
-       (count)))
-
 (defn part1
-  []
-  (count-valid-passwords valid-part1-password?))
+  [input]
+  (util/count-satisfying input valid-part1-password?))
 
 (defn valid-part2-password?
   [{:keys [n1 n2 character password]}]
@@ -36,9 +30,9 @@
            (= character (get password (dec n2)))])))
 
 (defn part2
-  []
-  (count-valid-passwords valid-part2-password?))
+  [input]
+  (util/count-satisfying input valid-part2-password?))
 
 (comment "run"
-  (part1)
-  (part2))
+  (part1 (util/input-lines "day02" parse-line))
+  (part2 (util/input-lines "day02" parse-line)))

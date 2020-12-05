@@ -17,8 +17,7 @@
   [tree-map angle]
   (-> tree-map
       (collision-sequence angle)
-      (->> (filter #(= \# %)))
-      (count)))
+      (util/count-satisfying #(= \# %))))
 
 (defn part1
   [tree-map]
