@@ -17,3 +17,13 @@
    (input-lines* identity)))
 
 (def input-lines (memoize input-lines*))
+
+(defn input*
+  [filename parse-fn]
+  (-> filename io/resource io/reader slurp parse-fn))
+
+(def input (memoize input*))
+
+(defn trim-lines
+  [s]
+  (string/replace s #"^ +" ""))
