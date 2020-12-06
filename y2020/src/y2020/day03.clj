@@ -1,5 +1,6 @@
 (ns y2020.day03
-  (:require [y2020.util :as util]))
+  (:require [y2020.util :as util]
+            [clojure.string :as string]))
 
 (defn map-coord
   [tree-map [x y]]
@@ -19,11 +20,13 @@
       (collision-sequence angle)
       (util/count-satisfying #(= \# %))))
 
-(defn part1
+(defn part1*
   [tree-map]
   (count-collisions tree-map [3 1]))
 
-(defn part2
+(def part1 (util/make-run-fn "day03" string/split-lines part1*))
+
+(defn part2*
   [tree-map]
   (* (count-collisions tree-map [1 1])
      (count-collisions tree-map [3 1])
@@ -31,6 +34,8 @@
      (count-collisions tree-map [7 1])
      (count-collisions tree-map [1 2])))
 
+(def part2 (util/make-run-fn "day03" string/split-lines part2*))
+
 (comment "run"
-  (part1 (util/input-lines "day03" vec))
-  (part2 (util/input-lines "day03" vec)))
+  (part1)
+  (part2))

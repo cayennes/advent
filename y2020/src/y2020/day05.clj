@@ -1,5 +1,10 @@
 (ns y2020.day05
-  (:require [y2020.util :as util]))
+  (:require [clojure.string :as string]
+            [y2020.util :as util]))
+
+(defn parse
+  [input]
+  (map vec (string/split-lines input)))
 
 (defn bsp->number
   [s]
@@ -12,11 +17,13 @@
   [input]
   (mapv bsp->number input))
 
-(defn part1
+(defn part1*
   [input]
   (apply max (taken-seats input)))
 
-(defn part2
+(def part1 (util/make-run-fn "day05" parse part1*))
+
+(defn part2*
   [input]
   (let [taken (set (taken-seats input))]
     (->> (range (* 128 8))
@@ -28,6 +35,8 @@
          (first)
          (second))))
 
+(def part2 (util/make-run-fn "day05" parse part2*))
+
 (comment "run"
-  (part1 (util/input-lines "day05" vec))
-  (part2 (util/input-lines "day05" vec)))
+  (part1)
+  (part2))

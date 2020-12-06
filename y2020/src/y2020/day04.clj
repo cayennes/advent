@@ -7,7 +7,7 @@
 (defn parse
   [input]
   (map #(apply array-map (string/split % #"[: \n]"))
-       (string/split input #"\n\n")))
+       (util/split-on-blanks input)))
 
 (def required-fields #{"byr" "iyr" "eyr" "hgt" "hcl" "ecl" "pid"})
 
@@ -15,9 +15,11 @@
   [passport]
   (set/subset? required-fields (set (keys passport))))
 
-(defn part1
+(defn part1*
   [input]
   (util/count-satisfying input has-required-fields?))
+
+(def part1 (util/make-run-fn "day04" parse part1*))
 
 (defn has-valid-data?
   [{:strs [byr iyr eyr hgt hcl ecl pid] :as passport}]
@@ -45,10 +47,12 @@
    ;; pid (Passport ID) - a nine-digit number, including leading zeroes.
    (re-matches #"[0-9]{9}" pid)))
 
-(defn part2
+(defn part2*
   [input]
   (util/count-satisfying input has-valid-data?))
 
+(def part2 (util/make-run-fn "day04" parse part2*))
+
 (comment "run"
-  (part1 (util/input "day04" parse))
-  (part2 (util/input "day04" parse)))
+  (part1)
+  (part2))

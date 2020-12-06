@@ -11,6 +11,10 @@
      :character (first character)
      :password (vec password)}))
 
+(defn parse
+  [input]
+  (mapv parse-line (string/split-lines input)))
+
 (defn valid-part1-password?
   [{:keys [n1 n2 character password]}]
   (<= n1
@@ -19,9 +23,11 @@
           (count))
       n2))
 
-(defn part1
+(defn part1*
   [input]
   (util/count-satisfying input valid-part1-password?))
+
+(def part1 (util/make-run-fn "day02" parse part1*))
 
 (defn valid-part2-password?
   [{:keys [n1 n2 character password]}]
@@ -29,10 +35,12 @@
      (set [(= character (get password (dec n1)))
            (= character (get password (dec n2)))])))
 
-(defn part2
+(defn part2*
   [input]
   (util/count-satisfying input valid-part2-password?))
 
+(def part2 (util/make-run-fn "day02" parse part2*))
+
 (comment "run"
-  (part1 (util/input-lines "day02" parse-line))
-  (part2 (util/input-lines "day02" parse-line)))
+  (part1)
+  (part2))

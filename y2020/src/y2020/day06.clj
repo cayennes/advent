@@ -3,28 +3,29 @@
             [clojure.set :as set]
             [clojure.string :as string]))
 
-(defn parse-group
-  [group-input]
-  (map set (string/split-lines group-input)))
-
 (defn parse
   [input]
-  (map parse-group (string/split input #"\n\n")))
+  (map #(map set (string/split-lines %))
+       (util/split-on-blanks input)))
 
-(defn part1
+(defn part1*
   [input]
   (->> input
        (map #(apply set/union %))
        (map count)
        (apply +)))
 
-(defn part2
+(def part1 (util/make-run-fn "day06" parse part1*))
+
+(defn part2*
   [input]
   (->> input
        (map #(apply set/intersection %))
        (map count)
        (apply +)))
 
+(def part2 (util/make-run-fn "day06" parse part2*))
+
 (comment "run"
-  (part1 (util/input "day06" parse))
-  (part2 (util/input "day06" parse)))
+  (part1)
+  (part2))

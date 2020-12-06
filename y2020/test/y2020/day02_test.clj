@@ -4,8 +4,8 @@
             [clojure.test :refer [deftest is]]))
 
 (deftest correct-results
-  (is (= 500 (d/part1 (util/input-lines "day02" d/parse-line))))
-  (is (= 313 (d/part2 (util/input-lines "day02" d/parse-line)))))
+  (is (= 500 (d/part1)))
+  (is (= 313 (d/part2))))
 
 (comment "run"
   (clojure.test/run-tests))

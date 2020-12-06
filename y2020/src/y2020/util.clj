@@ -2,31 +2,33 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as string]))
 
-(defn string-lines
-  "for use with test input"
-  [input-string line-parse-fn]
-  (->> (string/split input-string #"\n")
-       (mapv string/trim)
-       (mapv line-parse-fn)))
+;; reading input
 
-(defn input-lines*
-  ([filename line-parse-fn]
-   (with-open [rdr (-> filename io/resource io/reader)]
-     (mapv line-parse-fn (line-seq rdr))))
-  ([filename]
-   (input-lines* identity)))
+(defmulti read type)
 
-(def input-lines (memoize input-lines*))
+(defmethod read java.net.URL
+  [input-resource]
+  (slurp input-resource))
 
-(defn input*
-  [filename parse-fn]
-  (-> filename io/resource io/reader slurp parse-fn))
+(defmethod read java.lang.String
+  [input-string]
+  (string/replace input-string #"(?m)^ *" ""))
 
-(def input (memoize input*))
+(defn split-on-blanks
+  [input]
+  (string/split input #"\n\n"))
 
-(defn trim-lines
-  [s]
-  (string/replace s #"^ +" ""))
+;; running
+
+(defn make-run-fn
+  [resource-name parse-fn main-fn]
+  (let [real-input-resource (io/resource resource-name)
+        f #(-> % read parse-fn main-fn)]
+    (fn
+      ([] (f real-input-resource))
+      ([test-input] (f test-input)))))
+
+;; useful functions
 
 (defn count-satisfying
   [s pred]

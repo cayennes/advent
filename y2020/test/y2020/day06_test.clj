@@ -4,8 +4,8 @@
             [clojure.test :refer [deftest is]]))
 
 (deftest correct-results
-  (is (= 6590 (d/part1 (util/input "day06" d/parse))))
-  (is (= 3288 (d/part2 (util/input "day06" d/parse)))))
+  (is (= 6590 (d/part1)))
+  (is (= 3288 (d/part2))))
 
 (comment "run"
   (clojure.test/run-tests))
