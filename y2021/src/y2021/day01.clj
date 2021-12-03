@@ -25,8 +25,6 @@
        (map (partial apply +))
        (part1*)))
 
-(part2* (parse ex))
-
 (defn part2
   []
   (part2* (parse (slurp (io/resource "day01")))))
