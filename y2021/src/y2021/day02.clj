@@ -5,10 +5,9 @@
 
 (defn parse
   [input]
-  (->> input
-       (string/split-lines)
-       (map #(string/split % #" +"))
-       (map #(map edn/read-string %))))
+  (->> (str "(" input ")")
+       (edn/read-string)
+       (partition 2)))
 
 (defn part1*
   [input]
@@ -21,8 +20,9 @@
                input)
        (apply *)))
 
-(defn part1 []
-  (-> "day02" io/resource slurp parse part1*))
+(defn part1
+  ([input] (-> input parse part1*))
+  ([] (-> "day02" io/resource slurp part1)))
 
 (defn part2*
   [input]
@@ -36,5 +36,7 @@
        (butlast)
        (apply *)))
 
-(defn part2 []
-  (-> "day02" io/resource slurp parse part2*))
+
+(defn part2
+  ([input] (-> input parse part2*))
+  ([] (-> "day02" io/resource slurp part2)))
