@@ -26,14 +26,16 @@
   (apply + (filter some? board)))
 
 (defn turn
-  [{:keys [boards numbers]}]
+  [{:keys [boards numbers winning-score]}]
+  (prn boards)
   (let [[number & new-numbers] numbers
-        new-boards (map #(mark-num % number) boards)
-        winning-board (some #(if (win? %) %) new-boards)]
-    (merge {:boards new-boards
-            :numbers new-numbers}
-           (if winning-board
-             {:winning-score (* number (total-uncalled winning-board))}))))
+        updated-boards (map #(mark-num % number) boards)
+        winning-board (some #(if (win? %) %) updated-boards)]
+    {:boards (remove win? updated-boards)
+     :numbers new-numbers
+     :winning-score (if winning-board
+                      (* number (total-uncalled winning-board))
+                      winning-score)}))
 
 (defn part1*
   [input]
@@ -42,3 +44,11 @@
 (defn part1
   ([input] (-> input parse part1*))
   ([] (-> "day04" io/resource slurp part1)))
+
+(defn part2*
+  [input]
+  (:winning-score (util/iterate-until turn #(empty? (:numbers %)) input)))
+
+(defn part2
+  ([input] (-> input parse part2*))
+  ([] (-> "day04" io/resource slurp part2)))

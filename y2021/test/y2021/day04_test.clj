@@ -86,3 +86,9 @@
 
 (deftest part1-answer
   (is (= 34506 (d/part1))))
+
+(deftest part2-ex
+  (is (= 1924 (d/part2 ex))))
+
+(deftest part2-answer
+  (is (= 7686 (d/part2))))
