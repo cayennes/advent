@@ -8,10 +8,10 @@
 
 (defn generation
   [fish]
-  (-> {8 (fish 0 0)}
-      (into (for [[k v] fish] [(dec k) v]))
-      (dissoc -1)
-      (update 6 (fnil + 0) (fish 0 0))))
+  (apply merge-with +
+         {8 (fish 0 0)}
+         (for [[k v] fish]
+           {(if (zero? k) 6 (dec k)) v})))
 
 (defn fish-count-after
   [fish n]
