@@ -3,7 +3,9 @@
             [clojure.java.io :as io]
             [clojure.string :as string]))
 
-;; --- Day 2: Rock Paper Scissors ---
+;; # Day 2: Rock Paper Scissors
+;;
+;; ## Part 1
 ;; 
 ;; The Elves begin to set up camp on the beach. To decide whose tent gets to be closest to the snack storage, a giant Rock Paper Scissors tournament is already in progress.
 ;; 
@@ -82,7 +84,7 @@
 (def total-score
   (apply + scores))
 
-;; --- Part Two ---
+;; ## Part Two
 ;; 
 ;; The Elf finishes helping with the tent and sneaks back over to you. "Anyway, the second column says how the round needs to end: X means you need to lose, Y means you need to end the round in a draw, and Z means you need to win. Good luck!"
 ;; 
@@ -95,3 +97,34 @@
 ;; Now that you're correctly decrypting the ultra top secret strategy guide, you would get a total score of 12.
 ;; 
 ;; Following the Elf's instructions for the second column, what would your total score be if everything goes exactly according to your strategy guide?
+
+(defn shape-for-result
+  [[opponent-shape result]]
+  (inc (mod (+ opponent-shape result) 3)))
+
+(map shape-for-result parsed-example)
+;; (should be (1 1 1))
+
+(for [shape (range 1 4)]
+  (for [result (range 1 4)]
+    (shape-for-result [shape result])))
+
+(map shape-for-result parsed-input)
+
+(defn score-2
+  [[opponent-shape result]]
+  (+ (shape-for-result [opponent-shape result])
+     (* 3 (dec result))))
+
+(def example-scores-2 (map score-2 parsed-example))
+;; (should be (4 1 7))
+
+(def scores-2
+  (map score-2 parsed-input))
+
+(def total-example-score-2
+  (apply + example-scores-2))
+;; (should be 12)
+
+(def total-score-2
+  (apply + scores-2))
