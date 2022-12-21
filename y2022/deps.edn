@@ -1,3 +1,3 @@
 {:paths ["src/y2022" "resources"]
  :deps {org.clojure/clojure {:mvn/version "1.11.1"}
-        io.github.nextjournal/clerk {:mvn/version "0.9.513"}}}
+        io.github.nextjournal/clerk {:mvn/version "0.12.707"}}}
