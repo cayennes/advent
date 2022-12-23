@@ -125,29 +125,35 @@ hmdt: 32")
 
 ;; ### First, process the jobs map so that all things that can be calculated 
 
-(defn replace-number-monkeys
+(defn replace-known-monkeys
   "replace operands whose monkeys shout numbers with those numbers"
   [jobs]
   (into {}
         (for [[monkey job] jobs]
-          [monkey (if (map? job)
+          [monkey (cond
+                    (not (map? job))
+                    job
+
+                    ;; if the monkey has two numbers to work with, do the operation
+                    (and (:operator job) (every? number? (:operands job)))
+                    (apply (:operator job) (:operands job))
+
+                    ;; job the operands are monkey names for monkeys who have numbers, replace them with those
+                    :else
                     (update job :operands
                             (fn [operands]
                               (map #(if (number? (jobs %)) (jobs %) %)
-                                   operands)))
-                    job)])))
-
-;; TODO: also do possible calculations to replace jobs with numbers
+                                   operands))))])))
 
 ;; and do the opposite process in order to fill in things that must be known based on what the results are
 
 (def example-single-replacement
-  (replace-number-monkeys parsed-example))
+  (replace-known-monkeys parsed-example))
 
 (defn first-consecutive-duplicate
   [s]
   (->> s
-       (partition 2 1)
+       (partition 2 1) ;; sequence of adjacent pairs
        (filter #(apply = %))
        (first)
        (first)))
@@ -162,7 +168,7 @@ hmdt: 32")
 
 (defn replace-all-possible
   [jobs]
-  (iterate-until-unchanged replace-number-monkeys
+  (iterate-until-unchanged replace-known-monkeys
                            (dissoc jobs :humn)))
 
 (def example-simplified
