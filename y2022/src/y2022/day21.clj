@@ -169,10 +169,22 @@ hmdt: 32")
 (defn replace-all-possible
   [jobs]
   (iterate-until-unchanged replace-known-monkeys
-                           (dissoc jobs :humn)))
+                           (dissoc jobs :humn :root)))
 
 (def example-simplified
   (replace-all-possible parsed-example))
 
 (def simplified
   (replace-all-possible parsed-input))
+
+(defn reverse-instructions
+  [simplified-jobs]
+  (into {}
+        (for [[monkey job] simplified-jobs]
+          (when (not (number? job))
+            [(->> job (:operands) (filter keyword?) (first))
+             {:operator ({+ -, - +, * /,/ *} (:operator job))
+              :operands (->> job (:operands) (filter number?) (cons monkey))}]))))
+
+(def example-reversed-simplified
+  (reverse-instructions example-simplified))
