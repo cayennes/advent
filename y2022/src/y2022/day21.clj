@@ -177,14 +177,73 @@ hmdt: 32")
 (def simplified
   (replace-all-possible parsed-input))
 
-(defn reverse-instructions
+;; ## then make a structure with the inverse of everything so we can calculate the one we need
+
+(defn inverse-instructions
   [simplified-jobs]
   (into {}
-        (for [[monkey job] simplified-jobs]
-          (when (not (number? job))
-            [(->> job (:operands) (filter keyword?) (first))
+        (for [[monkey job] simplified-jobs
+              :when (not (number? job))
+              :let [operand-monkey (->> job (:operands) (filter keyword?) (first))
+                    {:keys [operator operands]} job]]
+          [operand-monkey
+           (cond
+             (keyword? (first operands))
+             ;; monkey = operand-monkey op operand-number
+             ;; => operand-monkey = monkey inv-op operand-number
              {:operator ({+ -, - +, * /,/ *} (:operator job))
-              :operands (->> job (:operands) (filter number?) (cons monkey))}]))))
+              :operands [monkey (second operands)]}
 
-(def example-reversed-simplified
-  (reverse-instructions example-simplified))
+             (#{+ *} operator)
+             ;; m = n + o => o = m - n
+             ;; m = n * o => o = m / n
+             {:operator ({+ -, * /} operator)
+              :operands [monkey (first operands)]}
+
+             :else
+             ;; m = n - o => o = n - m
+             ;; m = n / o => o = n / m
+             {:operator operator
+              :operands [(first operands) monkey]})])))
+
+(def example-inverse-simplified
+  (inverse-instructions example-simplified))
+
+(def inverse-simplified
+  (inverse-instructions simplified))
+
+;; ## put in what we know we need
+
+
+
+(->> example-simplified
+     (filter (fn [[monkey instructions]]
+               (and ((set (-> parsed-example :root :operands)) monkey)
+                    (number? instructions))))
+     (first))
+
+(-> (set (-> parsed-example :root :operands))
+    (disj :sjmn))
+
+
+(defn solve
+  [jobs simplified inverse]
+  ;; find the two monkeys that are equal and set the unknown to the known value
+  (let [equal-monkeys (set (-> jobs :root :operands))
+        [known-name known-value] (->> simplified
+                                      (filter (fn [[monkey instructions]]
+                                                (and (equal-monkeys monkey)
+                                                     (number? instructions))))
+                                      (first))
+        unknown-name (-> equal-monkeys
+                         (disj known-name)
+                         (first))]
+    (-> inverse
+        (assoc unknown-name known-value)
+        (calculate :humn))))
+
+(def example-answer-b
+  (solve parsed-example example-simplified example-inverse-simplified))
+
+(def answer-b
+  (solve parsed-input simplified inverse-simplified))
