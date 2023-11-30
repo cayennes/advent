@@ -50,7 +50,7 @@
 ;; input:
 ^{::clerk/visibility {:code :fold}}
 (def input
-  (slurp (io/resource "day07")))
+  (slurp (io/resource "day06")))
 
 (defn first-marker-position
   [input marker-size]
